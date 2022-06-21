@@ -60,9 +60,9 @@ BUGS: laptop - double duration of ISI in oddball phase - does not occur on PC
   ---> see also: https://osdoc.cogsci.nl/3.3/manual/devices/parallel/#windows-7-32-and-64-bit
 
 -  port = parallel.ParallelPort(0x03FF8) #dont quote it - CAVE: correct port needs to be identified
-  - use standalone "Parallel Port Tester programm"
-  - set all pins to low
-  - port.setData(0)
+  -- use standalone "Parallel Port Tester programm"
+  -- set all pins to low
+  -- port.setData(0)
 
 - data stored in hdf5 file - when mouse used as eyetracker
     #import h5py
