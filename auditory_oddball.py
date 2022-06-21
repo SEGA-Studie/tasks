@@ -15,7 +15,7 @@ from psychopy import visual, core, event, clock, data, gui, monitors, parallel #
 #from psychopy.tools.filetools import fromFile, toFile #filesystem - could be redundant?
 import random, time, sys, numpy #core libraries
 import psychtoolbox as ptb #sound processing via ptb
-from ctypes import windll #parallelport driver
+# from ctypes import windll #parallelport driver
 import tobii_research #eye-tracking SDK
 
 #import audio with prefrered sound class
