@@ -48,7 +48,7 @@ sound_one_in_Hz = 500 #if this is oddball or standard is defined below
 sound_two_in_Hz = 750 #if this is oddball or standard is defined below
 size_fixation_cross_in_pixels = 60 #also defines standard stimulus size
 ISI_interval = [1800, 2000] # inter stimulus interval, randomly varies between value0 and value1
-gaze_offset_cutoff = 2 * size_fixation_cross_in_pixels # when system will output a gze offsett from th center
+gaze_offset_cutoff = 3 * size_fixation_cross_in_pixels # when system will output a gze offsett from th center
 background_color_rgb = (0, 0, 0) #[0, 0 ,0] is gray as float [-1,1]
 white_slide = 'white'
 black_slide = 'black'
@@ -316,10 +316,10 @@ def draw_gazedirect(background_color=background_color_rgb):
     #parameters
     function_color = 'red'
     arrow_size_pix = size_fixation_cross_in_pixels
-    arrow_pos_offset = 3
+    arrow_pos_offset = 5
     width = 3
 
-    rect1 = visual.Rect(win=mywin, units='pix', lineColor=function_color, fillColor = background_color, lineWidth=width, size = size_fixation_cross_in_pixels*2)
+    rect1 = visual.Rect(win=mywin, units='pix', lineColor=function_color, fillColor = background_color, lineWidth=width, size = size_fixation_cross_in_pixels*6)
 
     #arrow left
     al_line1 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
