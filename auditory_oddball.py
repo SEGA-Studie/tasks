@@ -32,12 +32,12 @@ from psychopy.hardware import keyboard
 
 '''SETUP'''
 #path to data
-path_to_data = "C:/Users/stimulation/Desktop/project_py_oddball_280322/data/auditory_oddball/" #needs to be adapted for every setup
+path_to_data = "./data/auditory_oddball/" #creatig a data folder in the cwd
 trials_data_folder = path_to_data + 'trialdata/'
 eyetracking_data_folder = path_to_data + 'eyetracking/'
 
 # define experimental variables
-testmode = False # TRUE = mimicks an Eye-Tracker by Mouse movement, FALSE = eye-tracking hardware is required
+testmode = True # TRUE = mimicks an Eye-Tracker by Mouse movement, FALSE = eye-tracking hardware is required
 dialog_screen = 1 # input dialgue boxes are presented on external screen 1
 presentation_screen = 0 # stimuli are presented on internal screen 0
 
