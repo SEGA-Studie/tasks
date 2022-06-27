@@ -68,15 +68,8 @@ pulse_duration = 0.01 #10ms duration of trigger signal
 parallel_port_adress = 0x03FF8 #dont quote it - CAVE: correct port needs to be identified - use standalone "Parallel Port Tester programm" to identify it
 
 
-#define experimental settings as dictonary
-settings = {} #create a dictonary - all values added to this dictonary will be stored automatically for each trial,
-#TODO: add experimental settings from above
-#e.g. settings['stimulus_duration_in_seconds'] = 0.1
-# settings['number_of_trials'] = 5
-# settings['sound_one_in_Hz'] = 500
-# settings['sound_two_in_Hz'] = 750
-# settings['size_fixation_cross_in_pixels'] = 60
-# settings['ISI_interval'] = [1800, 2000]
+#dictionary containing experimental settings that will be stored automatically for each trial
+settings = {} 
 
 #infos in dialog box - added to dictonary with defaults
 settings['id'] = 123 #default testing value
