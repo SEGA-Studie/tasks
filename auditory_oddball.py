@@ -30,14 +30,17 @@ from psychopy.core import getTime, wait
 #read keyboard
 from psychopy.hardware import keyboard
 
+#Library for managing paths.
+from pathlib import Path
+
 '''SETUP'''
 #path to data
-path_to_data = "./data/auditory_oddball/" #creatig a data folder in the cwd
-trials_data_folder = path_to_data + 'trialdata/'
-eyetracking_data_folder = path_to_data + 'eyetracking/'
+path_to_data = Path("data", "auditory_oddball").resolve()
+trials_data_folder = str(path_to_data) + "/" + 'trialdata/'
+eyetracking_data_folder = str(path_to_data) + "/" + 'eyetracking/'
 
 # define experimental variables
-testmode = True # TRUE = mimicks an Eye-Tracker by Mouse movement, FALSE = eye-tracking hardware is required
+testmode = False # TRUE = mimicks an Eye-Tracker by Mouse movement, FALSE = eye-tracking hardware is required
 dialog_screen = 1 # input dialgue boxes are presented on external screen 1
 presentation_screen = 0 # stimuli are presented on internal screen 0
 
