@@ -8,6 +8,7 @@
 
 
 """LOAD MODULES"""
+from dis import Instruction
 from os import environ #hide messages in console from pygame
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' #hide messages in console from pygame
 
@@ -36,11 +37,14 @@ from pathlib import Path
 '''SETUP'''
 #path to data
 path_to_data = Path("data", "auditory_oddball").resolve()
-trials_data_folder = str(path_to_data) + "/" + 'trialdata/'
-eyetracking_data_folder = str(path_to_data) + "/" + 'eyetracking/'
+trials_data_folder = Path(path_to_data, 'trialdata')
+eyetracking_data_folder = Path(path_to_data, 'eyetracking')
+
+print(trials_data_folder)
+print(eyetracking_data_folder)
 
 # define experimental variables
-testmode = False # TRUE = mimicks an Eye-Tracker by Mouse movement, FALSE = eye-tracking hardware is required
+testmode = True # TRUE = mimicks an Eye-Tracker by Mouse movement, FALSE = eye-tracking hardware is required
 dialog_screen = 1 # input dialgue boxes are presented on external screen 1
 presentation_screen = 0 # stimuli are presented on internal screen 0
 
@@ -94,7 +98,7 @@ exp = data.ExperimentHandler(
     name="auditory_oddball",
     version='0.1',
     extraInfo = settings, #experiment info
-    dataFileName = trials_data_folder + fileName, # where to save the data
+    dataFileName = str(trials_data_folder / fileName), # where to save the data
     )
 
 #prepare sound presentation and define condition (balanced across groups)
@@ -168,9 +172,9 @@ if not testmode:
 
 #use IOHUB to create a different instance that records eye tracking data in hdf5 file  - saved in datastore_name
 io = launchHubServer(**iohub_config,
-                        experiment_code = eyetracking_data_folder,
+                        experiment_code = str(eyetracking_data_folder),
                         session_code = fileName,
-                        datastore_name = eyetracking_data_folder + fileName, #where data is stored
+                        datastore_name = str(eyetracking_data_folder / fileName), #where data is stored
                         window = mywin)
 
 #calls the eyetracker device
@@ -284,6 +288,21 @@ def send_trigger(trigger_name):
     if not trigger_name_found:
         print('trigger name is not defined: ' + trigger_name)
 
+# draw instruction slide 1
+def draw_instruction1(background_color=background_color_rgb):
+
+    if background_color is not background_color_rgb:
+        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
+        background_rect.draw()
+
+    instruction1 = visual.TextStim(
+        win=mywin,
+        text="Instruktion1",
+        color='black',
+        units='pix',
+        height=size_fixation_cross_in_pixels)
+
+    instruction1.draw()
 
 # draw a fixation cross from lines
 def draw_fixcross(background_color=background_color_rgb):
@@ -589,11 +608,9 @@ def present_ball(which_phase):
     print(which_phase + " duration:",actual_manipulation_duration)
     return actual_manipulation_duration
 
-
-
 """EXPERIMENTAL DESIGN """
 
-phase_sequence = ['baseline_calibration','oddball_block','baseline','oddball_block','baseline','manipulation_block','baseline','oddball_block','baseline','oddball_block','baseline']
+phase_sequence = ['instruction1','baseline_calibration','oddball_block','baseline','oddball_block','baseline','manipulation_block','baseline','oddball_block','baseline','oddball_block','baseline']
 phase_handler = data.TrialHandler(phase_sequence,nReps = 1, method='sequential') #trial handler calls the sequence and displays it randomized
 exp.addLoop(phase_handler) #add loop of block to experiment handler - any data that is collected  will be transfered to experiment handler automatically
 
@@ -609,6 +626,11 @@ send_trigger('experiment_start')
 for phase in phase_handler:
 
     block_counter += 1
+
+    if phase == 'instruction1':
+        draw_instruction1()
+        mywin.flip()
+        exp.nextEntry()
 
     if phase == 'oddball_block':
         # # problem with this randomization - oddball might not occur
