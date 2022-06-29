@@ -36,7 +36,7 @@ from pathlib import Path
 
 '''SETUP'''
 #path to data
-path_to_data = Path("data", "auditory_oddball").resolve()
+path_to_data = Path("Desktop", "tasks", "data", "auditory_oddball").resolve()
 trials_data_folder = Path(path_to_data, 'trialdata')
 eyetracking_data_folder = Path(path_to_data, 'eyetracking')
 
@@ -44,7 +44,7 @@ print(trials_data_folder)
 print(eyetracking_data_folder)
 
 # define experimental variables
-testmode = True # TRUE = mimicks an Eye-Tracker by Mouse movement, FALSE = eye-tracking hardware is required
+testmode = False # TRUE = mimicks an Eye-Tracker by Mouse movement, FALSE = eye-tracking hardware is required
 dialog_screen = 1 # input dialgue boxes are presented on external screen 1
 presentation_screen = 0 # stimuli are presented on internal screen 0
 
