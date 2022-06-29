@@ -297,12 +297,28 @@ def draw_instruction1(background_color=background_color_rgb):
 
     instruction1 = visual.TextStim(
         win=mywin,
-        text="Instruktion1",
+        text="Beispieltext1",
         color='black',
         units='pix',
         height=size_fixation_cross_in_pixels)
 
     instruction1.draw()
+
+# draw instruction slide 2
+def draw_instruction2(background_color=background_color_rgb):
+
+    if background_color is not background_color_rgb:
+        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
+        background_rect.draw()
+
+    instruction2 = visual.TextStim(
+        win=mywin,
+        text="Beispieltext2",
+        color='black',
+        units='pix',
+        height=size_fixation_cross_in_pixels)
+
+    instruction2.draw()
 
 # draw a fixation cross from lines
 def draw_fixcross(background_color=background_color_rgb):
@@ -610,7 +626,7 @@ def present_ball(which_phase):
 
 """EXPERIMENTAL DESIGN """
 
-phase_sequence = ['instruction1','baseline_calibration','oddball_block','baseline','oddball_block','baseline','manipulation_block','baseline','oddball_block','baseline','oddball_block','baseline']
+phase_sequence = ['instruction1','baseline_calibration','oddball_block','baseline','oddball_block','baseline','instruction2','manipulation_block','baseline','oddball_block','baseline','oddball_block','baseline']
 phase_handler = data.TrialHandler(phase_sequence,nReps = 1, method='sequential') #trial handler calls the sequence and displays it randomized
 exp.addLoop(phase_handler) #add loop of block to experiment handler - any data that is collected  will be transfered to experiment handler automatically
 
@@ -630,7 +646,18 @@ for phase in phase_handler:
     if phase == 'instruction1':
         draw_instruction1()
         mywin.flip()
+        core.wait(10)
         exp.nextEntry()
+
+    if phase == 'instruction2':
+        draw_instruction2()
+        mywin.flip()
+        core.wait(10)
+        #event.waitKeys(keyList=['space'])
+        
+        #keys=kb.getKeys(['space'], waitRelease=True)
+        #if 'space' in keys:
+        exp.nextEntry 
 
     if phase == 'oddball_block':
         # # problem with this randomization - oddball might not occur
