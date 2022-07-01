@@ -646,13 +646,15 @@ for phase in phase_handler:
     if phase == 'instruction1':
         draw_instruction1()
         mywin.flip()
-        core.wait(10)
+        #core.wait(10)
+        keys = event.waitKeys()
         exp.nextEntry()
 
     if phase == 'instruction2':
         draw_instruction2()
         mywin.flip()
-        core.wait(10)
+        #core.wait(10)
+        keys = event.waitKeys()
         exp.nextEntry 
 
     if phase == 'oddball_block':
