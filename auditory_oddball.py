@@ -297,7 +297,7 @@ def draw_instruction1(background_color=background_color_rgb):
 
     instruction1 = visual.TextStim(
         win=mywin,
-        text="Beispieltext1",
+        text="Das Experiment beginnt jetzt.\n Bitte bleibe still sitzen und \n schaue auf das Kreuz in der Mitte.",
         color='black',
         units='pix',
         height=size_fixation_cross_in_pixels)
@@ -313,7 +313,7 @@ def draw_instruction2(background_color=background_color_rgb):
 
     instruction2 = visual.TextStim(
         win=mywin,
-        text="Beispieltext2",
+        text="Gleich wirst du einen farbigen Kreis sehen.\n Bitte drücke dann fest das Kraftmessgerät.",
         color='black',
         units='pix',
         height=size_fixation_cross_in_pixels)
@@ -653,10 +653,6 @@ for phase in phase_handler:
         draw_instruction2()
         mywin.flip()
         core.wait(10)
-        #event.waitKeys(keyList=['space'])
-        
-        #keys=kb.getKeys(['space'], waitRelease=True)
-        #if 'space' in keys:
         exp.nextEntry 
 
     if phase == 'oddball_block':
