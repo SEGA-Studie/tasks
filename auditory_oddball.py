@@ -9,7 +9,8 @@
 
 """LOAD MODULES"""
 from dis import Instruction
-from os import environ #hide messages in console from pygame
+from os import environ
+from textwrap import wrap #hide messages in console from pygame
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' #hide messages in console from pygame
 
 from psychopy import visual, core, event, clock, data, gui, monitors, parallel #psychopy libararies
@@ -300,6 +301,7 @@ def draw_instruction1(background_color=background_color_rgb):
         text="Das Experiment beginnt jetzt.\n Bitte bleibe still sitzen und \n schaue auf das Kreuz in der Mitte.",
         color='black',
         units='pix',
+        wrapWidth = 900,
         height=size_fixation_cross_in_pixels)
 
     instruction1.draw()
@@ -316,6 +318,7 @@ def draw_instruction2(background_color=background_color_rgb):
         text="Gleich wirst du einen farbigen Kreis sehen.\n Bitte drücke dann fest das Kraftmessgerät.",
         color='black',
         units='pix',
+        wrapWidth = 900,
         height=size_fixation_cross_in_pixels)
 
     instruction2.draw()
