@@ -8,7 +8,6 @@
 
 
 """LOAD MODULES"""
-from dis import Instruction
 from os import environ
 from textwrap import wrap #hide messages in console from pygame
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' #hide messages in console from pygame
@@ -298,7 +297,7 @@ def draw_instruction1(background_color=background_color_rgb):
 
     instruction1 = visual.TextStim(
         win=mywin,
-        text="Das Experiment beginnt jetzt.\n Bitte bleibe still sitzen und \n schaue auf das Kreuz in der Mitte.",
+        text="Das Experiment beginnt jetzt.\nBitte bleibe still sitzen und\nschaue auf das Kreuz in der Mitte.\n\n Weiter mit der Leertaste.",
         color='black',
         units='pix',
         wrapWidth = 900,
@@ -315,7 +314,7 @@ def draw_instruction2(background_color=background_color_rgb):
 
     instruction2 = visual.TextStim(
         win=mywin,
-        text="Gleich wirst du einen farbigen Kreis sehen.\n Bitte drücke dann fest das Kraftmessgerät.",
+        text="Gleich wirst du einen farbigen Kreis sehen.\nBitte drücke dann fest das Kraftmessgerät.\n\nMit der Leertaste geht es weiter.",
         color='black',
         units='pix',
         wrapWidth = 900,
@@ -649,15 +648,14 @@ for phase in phase_handler:
     if phase == 'instruction1':
         draw_instruction1()
         mywin.flip()
-        #core.wait(10)
-        keys = event.waitKeys()
+        keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry()
 
     if phase == 'instruction2':
         draw_instruction2()
         mywin.flip()
         #core.wait(10)
-        keys = event.waitKeys()
+        keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry 
 
     if phase == 'oddball_block':
