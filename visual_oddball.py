@@ -20,7 +20,7 @@ from pathlib import Path
 from os import environ #hide messages in console from pygame
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' #hide messages in console from pygame
 
-#from auditory_oddball import send_trigger
+# From auditory_oddball import send_trigger:
 print("This is visual oddball")
 
 '''SETUP'''
@@ -408,7 +408,7 @@ def check_gaze_offset(gaze_position):
     return offset_boolean
 
 # Fixation cross: Check for data availability and screen center gaze:
-def fixcross_gazecontingent(duration_in_seconds, background_color=background_color_rgb):
+def fixcross_gazecontingent(duration_in_seconds, background_color = background_color_rgb):
     # Translate duration to number of frames:
     number_of_frames = round(duration_in_seconds/refresh_rate)
     timestamp = getTime()
@@ -419,10 +419,10 @@ def fixcross_gazecontingent(duration_in_seconds, background_color=background_col
     for frameN in range(number_of_frames):
         # Check for keypress
         pause_duration += check_keypress()
-        gaze_position = tracker.getPosition
+        gaze_position = tracker.getPosition()
         # Check for eyetracking data:
         if check_nodata(gaze_position):
-            print('warning:no eyes detected')
+            print('warning: no eyes detected')
             # Reset duration for loop, restart ISI:
             frameN = 1 
             nodata_current_duration = 0
@@ -717,35 +717,29 @@ for phase in phase_handler:
     #         send_trigger('ISI')
     #         [fixcross_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(ISI)
 
-
-
-
 # During calibration process, pupil dilation (black slide) and pupil constriction (white slide) are assessed.
     if phase == 'baseline_calibration':
         baseline_sequence = ['baseline','baseline_whiteslide','baseline_blackslide']
         baseline_calibration_repetition = baseline_calibration_repetition
         # Trial handler calls the sequence and displays it randomized:
         exp_baseline_calibration = data.TrialHandler(baseline_sequence,nReps = baseline_calibration_repetition, method='sequential')
-        # Add loop of block to experiment handler. Collected data will be transfered to experiment handler automatically:
+        # Baseline calibration block is added to loop.
+        # Collected data will be transfered to experiment handler automatically:
         exp.addLoop(exp_baseline_calibration)
 
         send_trigger('baseline_calibration')
         print('START OF BASELINE CALIBRATION PHASE')
 
         for baseline_trial in baseline_sequence:
-
             if baseline_trial == 'baseline':
-
-                #create data
-                timestamp = time.time() #epoch
-                timestamp_exp = getTime() #time since start of experiment - also recorded by eyetracker
-
-                #present baseline
+                timestamp = time.time() # Epoch
+                # Time since start of experiment, is also recorded by eyetracker.
+                timestamp_exp = getTime() 
+                # Present baseline
                 send_trigger('baseline')
-                [stimulus_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(
-                    baseline_duration)
+                [stimulus_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(baseline_duration)
 
-                #collect global data --> saved to csv
+                # Global data is saved to output file:
                 phase_handler.addData('phase', phase)
                 phase_handler.addData('block_counter', block_counter)
                 phase_handler.addData('stimulus_duration', stimulus_duration)
@@ -760,16 +754,16 @@ for phase in phase_handler:
                 exp.nextEntry()
 
             if baseline_trial == 'baseline_whiteslide':
-                # create data
-                timestamp = time.time() #epoch
-                timestamp_exp = getTime() #time since start of experiment - also recorded by eyetracker
+                timestamp = time.time() # Epoch
+                # Time since start of experiment, is also recorded by eyetracker.
+                timestamp_exp = getTime() 
 
-                #present baseline - but with white background
+                # Present baseline with white background:
                 send_trigger('baseline_whiteslide')
                 [stimulus_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(
                     baseline_duration, background_color = white_slide)
 
-                #collect global data --> saved to csv
+                # Global data is saved to output file:
                 phase_handler.addData('phase', phase)
                 phase_handler.addData('block_counter', block_counter)
                 phase_handler.addData('stimulus_duration', stimulus_duration)
@@ -784,15 +778,14 @@ for phase in phase_handler:
                 exp.nextEntry()
             
             if baseline_trial == 'baseline_blackslide':
-                #create data
                 timestamp = time.time() #epoch
                 timestamp_exp = getTime() #time since start of experiment - also recorded by eyetracker
-                #present baseline - but with black background
+                # Present baseline with black background:
                 send_trigger('baseline_blackslide')
                 [stimulus_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(
                     baseline_duration, background_color = black_slide)
 
-                #collect global data --> saved to csv
+                # Global data is saved to output file:
                 phase_handler.addData('phase', phase)
                 phase_handler.addData('block_counter', block_counter)
                 phase_handler.addData('stimulus_duration', stimulus_duration)
