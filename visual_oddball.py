@@ -235,7 +235,7 @@ def draw_instruction3(background_color = background_color_rgb):
 
     instruction2 = visual.TextStim(
         win = mywin,
-        text = "Die Übung ist beendet. Bitte bleibe weiterhin still sitzen.\nHast du noch Fragen? Dann wende dich bitte an die Versuchsleitng. Gleich geht es mit der Aufgabe los.",
+        text = "Die Übung ist beendet. Bitte bleibe still sitzen.\n\nGleich geht es mit der Aufgabe los.",
         color = 'black',
         units = 'pix',
         wrapWidth = 900,
