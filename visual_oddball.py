@@ -220,7 +220,7 @@ def draw_instruction2(background_color = background_color_rgb):
 
     instruction2 = visual.TextStim(
         win = mywin,
-        text = "Gleich startet die Übung.\nEs werden Kreise auf dem Bildschirm erscheinen. Bitte drücke bei auffälligen Kreisen so schnell wie möglich die Leertase.",
+        text = "Gleich startet die Übung.\nEs werden Kreise auf dem Bildschirm erscheinen. Weiter geht es mit der Leertaste.",
         color = 'black',
         units = 'pix',
         wrapWidth = 900,
@@ -235,7 +235,7 @@ def draw_instruction3(background_color = background_color_rgb):
 
     instruction2 = visual.TextStim(
         win = mywin,
-        text = "Die Übung ist jetzt beendet.\nBitte bleibe weiterhin still sitzen. Gleich geht es mit der Aufgabe los.",
+        text = "Die Übung ist beendet. Bitte bleibe weiterhin still sitzen.\nHast du noch Fragen? Dann wende dich bitte an die Versuchsleitng. Gleich geht es mit der Aufgabe los.",
         color = 'black',
         units = 'pix',
         wrapWidth = 900,
@@ -259,10 +259,10 @@ def draw_fixcross(background_color=background_color_rgb):
     line2.draw()
 
 # Draw figure when gaze is offset for gaze contincency:
-def draw_gazedirect(background_color=background_color_rgb):
+def draw_gazedirect(background_color = background_color_rgb):
         # Adapt background according to privuded "background color"
     if background_color is not background_color_rgb:
-        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
+        background_rect = visual.Rect(win = mywin, size = mywin.size, fillColor = background_color)
         background_rect.draw()
     # Parameters:
     function_color = 'red'
@@ -271,11 +271,11 @@ def draw_gazedirect(background_color=background_color_rgb):
     width = 3
 
     rect1 = visual.Rect(
-        win=mywin,
-        units='pix',
-        lineColor=function_color,
-        fillColor = background_color_rgb,
-        lineWidth=width,
+        win = mywin,
+        units = 'pix',
+        lineColor = function_color,
+        fillColor = background_color,
+        lineWidth = width,
         size = size_fixation_cross_in_pixels*6)
 
     # Arrow left:
@@ -498,10 +498,10 @@ def present_ball(duration, trial, salience):
     print(trial + " duration:",actual_stimulus_duration)
     return actual_stimulus_duration
 
-# Random interstimulus interval (ISI):
+# Random Interstimulus Interval (ISI):
 def define_ISI_interval():
     ISI = random.randint(ISI_interval[0], ISI_interval[1])
-    ISI = ISI/1000 # get to second format
+    ISI = ISI/1000 # ms -> s
     return ISI
 
 '''EXPERIMENTAL DESIGN'''
@@ -515,7 +515,7 @@ phase_sequence = [
     'instruction1',
     'baseline_calibration',
     'instruction2',
-    # 'practice_trials',
+    'practice_trials',
     'baseline',
     'instruction3',
     oddballs[0],
@@ -526,7 +526,6 @@ phase_sequence = [
     'baseline',
     oddballs[3]
     ]
-
 
 phase_handler = data.TrialHandler(phase_sequence,nReps = 1, method='sequential')
 exp.addLoop(phase_handler)
@@ -556,7 +555,7 @@ for phase in phase_handler:
         exp.nextEntry
 
     if phase == 'instruction3':
-        draw_instruction2()
+        draw_instruction3()
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry
@@ -564,13 +563,13 @@ for phase in phase_handler:
     if phase.startswith('oddball_'):
         # Common oddball setup.
         oddball_parameters = phase.split('_')[1] # remove the 'oddball_' portion of the phase name
-        (u, s) = oddball_parameters
+        (u, s) = oddball_parameters # u = utility; s = slience
 
         # Setup oddball trials. Sequence for trial handler with 1/5 chance for an oddball.
         stimulus_sequence = ['standard','standard','standard','standard','oddball']
 
         # Trial handler calls the sequence and displays it randomized:
-        trials = data.TrialHandler(stimulus_sequence,nReps = number_of_repetitions, method='random')
+        trials = data.TrialHandler(stimulus_sequence,nReps = number_of_repetitions, method = 'random')
         # Add loop of block to experiment handler. Any collected data will be transfered to experiment handler automatically.
         exp.addLoop(trials)
         # Onset of oddball block:
@@ -579,7 +578,7 @@ for phase in phase_handler:
 
         for trial in trials:
             send_trigger('trial')
-            ISI = define_ISI_interval() # for each trial separately
+            ISI = define_ISI_interval() # jittery ISI for each trial separately
             timestamp = time.time() # epoch
             timestamp_exp = getTime() # time since start of experiment - also recorded by eyetracker
             timestamp_tracker = tracker.trackerTime()
@@ -617,7 +616,6 @@ for phase in phase_handler:
         baseline_trial_counter += 1
         exp.nextEntry()
 
-
     if phase == 'practice_trials':
         # Define a sequence for trial handler with 1/5 chance for an oddball.
         practice_sequence = ['standard','standard','standard','standard','oddball']
@@ -643,18 +641,17 @@ for phase in phase_handler:
             print("gaze position: ",tracker.getPosition())
             # Stimulus presentation:
             send_trigger('stimulus')
-            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = practice_trial, salience = '-')
+            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = practice_trial, salience = 'u')
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(ISI)
-            # Collect global data, saved to csv:
+            # Collected global data is savd to output file:
             phase_handler.addData('phase', phase)
             phase_handler.addData('block_counter', block_counter)
-            # Collect trial data, saved to csv:
-            practice_trials.addData('oddball_trial_counter',oddball_trial_counter) #trial number
-            practice_trials.addData('practice_trial', practice_trial) #oddball or standard
-            practice_trials.addData('timestamp', timestamp) #seconds since 01.01.1970 (epoch)
-            practice_trials.addData('timestamp_exp', timestamp_exp) #time since start of experiment
-            practice_trials.addData('timestamp_tracker', timestamp_tracker) #time of eye tracker (same as epoch?)
+            practice_trials.addData('oddball_trial_counter',oddball_trial_counter) 
+            practice_trials.addData('practice_trial', practice_trial)
+            practice_trials.addData('timestamp', timestamp) 
+            practice_trials.addData('timestamp_exp', timestamp_exp) #
+            practice_trials.addData('timestamp_tracker', timestamp_tracker) 
             practice_trials.addData('stimulus_duration', actual_stimulus_duration)
             practice_trials.addData('ISI_expected', ISI)
             practice_trials.addData('ISI_duration', fixcross_duration)
@@ -662,7 +659,6 @@ for phase in phase_handler:
             practice_trials.addData('trial_pause_duration', pause_duration)
             practice_trials.addData('trial_nodata_duration', nodata_duration)
             oddball_trial_counter += 1
-            # Experiment handler moves to next trial. All data is collected for this trial.
         exp.nextEntry() 
 
 # During calibration process, pupil dilation (black slide) and
