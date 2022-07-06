@@ -44,7 +44,7 @@ size_fixation_cross_in_pixels = 60
 standard_ball_size = size_fixation_cross_in_pixels
 high_salience_ball_size = round(0.5 * size_fixation_cross_in_pixels)
 low_salience_ball_size = round(0.91 * size_fixation_cross_in_pixels)
-ISI_interval = [1800, 2000]
+ISI_interval = [2250, 2500]
 gaze_offset_cutoff = 2 * size_fixation_cross_in_pixels
 background_color_rgb = (0, 0, 0) # grey
 white_slide = 'white'
@@ -515,7 +515,7 @@ phase_sequence = [
     'instruction1',
     'baseline_calibration',
     'instruction2',
-    'practice_trials',
+    #'practice_trials',
     'baseline',
     'instruction3',
     oddballs[0],
@@ -543,18 +543,21 @@ for phase in phase_handler:
     block_counter += 1
 
     if phase == 'instruction1':
+        print('SHOW INSTRUCTIONS SLIDE 1')
         draw_instruction1()
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry
     
     if phase == 'instruction2':
+        print('SHOW INSTRUCTIONS SLIDE 2')
         draw_instruction2()
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry
 
     if phase == 'instruction3':
+        print('SHOW INSTRUCTIONS SLIDE 3')
         draw_instruction3()
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
@@ -565,7 +568,7 @@ for phase in phase_handler:
         oddball_parameters = phase.split('_')[1] # remove the 'oddball_' portion of the phase name
         (u, s) = oddball_parameters # u = utility; s = slience
 
-        # Setup oddball trials. Sequence for trial handler with 1/5 chance for an oddball.
+        # Sequence for trial handler with 1/5 chance for an oddball.
         stimulus_sequence = ['standard','standard','standard','standard','oddball']
 
         # Trial handler calls the sequence and displays it randomized:
@@ -617,11 +620,15 @@ for phase in phase_handler:
         exp.nextEntry()
 
     if phase == 'practice_trials':
+        # Common oddball setup.
+        oddball_parameters = phase.split('_')[1] # remove the 'oddball_' portion of the phase name
+        (u, s) = oddball_parameters # u = utility; s = slience
+
         # Define a sequence for trial handler with 1/5 chance for an oddball.
         practice_sequence = ['standard','standard','standard','standard','oddball']
         number_of_repetitions = round(number_of_practice_trials/len(practice_sequence))
         # Trial handler calls the sequence and displays it randomized:
-        practice_trials = data.TrialHandler(practice_sequence,nReps = number_of_repetitions, method='random')
+        practice_trials = data.TrialHandler(practice_sequence, nReps = number_of_repetitions, method='random')
         # Add loop of block to experiment handler. Any collected data by trials will be transfered to experiment handler automaticall.
         exp.addLoop(practice_trials) 
         # Onset of practice_trials:
@@ -744,6 +751,7 @@ for phase in phase_handler:
 '''WRAP UP AND CLOSE'''
 # Send trigger that experiment has ended:
 send_trigger('experiment_end')
+print('EXPERIMENT ENDED')
 # Close reading from eyetracker:
 tracker.setRecordingState(False) 
 # Close iohub instance:
