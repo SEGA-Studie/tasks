@@ -45,8 +45,9 @@ standard_ball_size = size_fixation_cross_in_pixels
 high_salience_ball_size = round(0.5 * size_fixation_cross_in_pixels)
 low_salience_ball_size = round(0.91 * size_fixation_cross_in_pixels)
 ISI_interval = [2250, 2500]
-gaze_offset_cutoff = 2 * size_fixation_cross_in_pixels
+gaze_offset_cutoff = 3 * size_fixation_cross_in_pixels
 background_color_rgb = (0, 0, 0) # grey
+#cross_color_rgb = (-127, -127, -127)
 white_slide = 'white'
 black_slide = 'black'
 baseline_duration = 5 # in seconds, duration of baseline screen, target: 10.
@@ -145,8 +146,6 @@ trigger_name_list = ['PLACEHOLDER', #0
                      'stimulus', #2 -
                      'ISI', #3 -
                      'baseline', #4 -
-                     #'manipulation_squeeze', #5 -
-                     #'manipulation_relax', #6 -
                      'experiment_start', #7 -
                      'experiment_end', #8 -
                      'pause_initiated', #9 -
@@ -250,7 +249,7 @@ def draw_instruction4(background_color = background_color_rgb):
 
     instruction4 = visual.TextStim(
         win = mywin,
-        text = "Das Experiment ist jetzt beendet.\nBitte bleibe still noch sitzen.",
+        text = "Das Experiment ist jetzt beendet.\nBitte bleibe noch still sitzen.",
         color = 'black',
         units = 'pix',
         wrapWidth = 900,
@@ -258,16 +257,14 @@ def draw_instruction4(background_color = background_color_rgb):
     instruction4.draw()
 
 # Draw fixation cross from lines:
-def draw_fixcross(background_color=background_color_rgb):
-
+def draw_fixcross(background_color=background_color_rgb, cross_color = 'black'):
     if background_color is not background_color_rgb:
         background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
         background_rect.draw()
-
-    line1 = visual.Line(win=mywin, units='pix', lineColor='black') #define line object
+    line1 = visual.Line(win = mywin, units = 'pix', lineColor = cross_color) 
     line1.start = [-(size_fixation_cross_in_pixels/2), 0]
     line1.end = [+(size_fixation_cross_in_pixels/2), 0]
-    line2 = visual.Line(win=mywin, units='pix', lineColor='black') #define line object
+    line2 = visual.Line(win = mywin, units = 'pix', lineColor = cross_color) 
     line2.start = [0, -(size_fixation_cross_in_pixels/2)]
     line2.end = [0, +(size_fixation_cross_in_pixels/2)]
     line1.draw()
@@ -360,12 +357,15 @@ def draw_gazedirect(background_color = background_color_rgb):
 def draw_nodata_info(background_color=background_color_rgb):
     # Adapt background according to privuded "background color":
     if background_color is not background_color_rgb:
-        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
+        background_rect = visual.Rect(
+            win = mywin,
+            size = mywin.size,
+            fillColor = background_color)
         background_rect.draw()
 
     no_data_warning = visual.TextStim(
-        win=mywin,
-        text='NO EYES DETECTED!',
+        win = mywin,
+        text = 'NO EYES DETECTED!',
         color = 'red',
         units = 'pix',
         height = size_fixation_cross_in_pixels)
@@ -422,7 +422,7 @@ def check_gaze_offset(gaze_position):
     return offset_boolean
 
 # Fixation cross: Check for data availability and screen center gaze:
-def fixcross_gazecontingent(duration_in_seconds, background_color = background_color_rgb):
+def fixcross_gazecontingent(duration_in_seconds, background_color = background_color_rgb, cross_color = 'black'):
     # Translate duration to number of frames:
     number_of_frames = round(duration_in_seconds/refresh_rate)
     timestamp = getTime()
@@ -463,7 +463,7 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
                 # Get new gaze data:
                 gaze_position = tracker.getPosition() 
         # Draw fixation cross:
-        draw_fixcross(background_color)
+        draw_fixcross(background_color, cross_color)
         mywin.flip()
 
     # Generate output info:
@@ -543,7 +543,7 @@ phase_sequence = [
     'instruction4'
     ]
 
-phase_handler = data.TrialHandler(phase_sequence,nReps = 1, method='sequential')
+phase_handler = data.TrialHandler(phase_sequence,nReps = 1, method = 'sequential')
 exp.addLoop(phase_handler)
 
 # Define global variables:
@@ -696,7 +696,6 @@ for phase in phase_handler:
     if phase == 'baseline_calibration':
         baseline_sequence = ['baseline','baseline_whiteslide','baseline_blackslide']
         baseline_calibration_repetition = baseline_calibration_repetition
-        # Trial handler calls the sequence and displays it randomized:
         exp_baseline_calibration = data.TrialHandler(baseline_sequence,nReps = baseline_calibration_repetition, method='sequential')
         # Baseline calibration block is added to loop.
         # Collected data will be transfered to experiment handler automatically:
@@ -713,7 +712,6 @@ for phase in phase_handler:
                 # Present baseline
                 send_trigger('baseline')
                 [stimulus_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(baseline_duration)
-
                 # Global data is saved to output file:
                 phase_handler.addData('phase', phase)
                 phase_handler.addData('block_counter', block_counter)
@@ -756,7 +754,7 @@ for phase in phase_handler:
                 # Present baseline with black background:
                 send_trigger('baseline_blackslide')
                 [stimulus_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(
-                    baseline_duration, background_color = black_slide)
+                    baseline_duration, background_color = black_slide, cross_color = 'grey')
 
                 # Global data is saved to output file:
                 phase_handler.addData('phase', phase)
