@@ -233,14 +233,29 @@ def draw_instruction3(background_color = background_color_rgb):
         background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
         background_rect.draw()
 
-    instruction2 = visual.TextStim(
+    instruction3 = visual.TextStim(
         win = mywin,
-        text = "Die Übung ist beendet. Bitte bleibe still sitzen.\n\nGleich geht es mit der Aufgabe los.",
+        text = "Die Übung ist beendet.\nBitte bleibe still sitzen.\n\nGleich beginnt die Aufgabe.",
         color = 'black',
         units = 'pix',
         wrapWidth = 900,
         height = size_fixation_cross_in_pixels)
-    instruction2.draw()
+    instruction3.draw()
+
+# Draw instruction slide 4:
+def draw_instruction4(background_color = background_color_rgb):
+    if background_color is not background_color_rgb:
+        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
+        background_rect.draw()
+
+    instruction4 = visual.TextStim(
+        win = mywin,
+        text = "Das Experiment ist jetzt beendet.\nBitte bleibe still noch sitzen.",
+        color = 'black',
+        units = 'pix',
+        wrapWidth = 900,
+        height = size_fixation_cross_in_pixels)
+    instruction4.draw()
 
 # Draw fixation cross from lines:
 def draw_fixcross(background_color=background_color_rgb):
@@ -524,7 +539,8 @@ phase_sequence = [
     'baseline',
     oddballs[2],
     'baseline',
-    oddballs[3]
+    oddballs[3],
+    'instruction4'
     ]
 
 phase_handler = data.TrialHandler(phase_sequence,nReps = 1, method='sequential')
@@ -559,6 +575,13 @@ for phase in phase_handler:
     if phase == 'instruction3':
         print('SHOW INSTRUCTIONS SLIDE 3')
         draw_instruction3()
+        mywin.flip()
+        keys = event.waitKeys(keyList = ["space"])
+        exp.nextEntry
+    
+    if phase == 'instruction4':
+        print('SHOW INSTRUCTIONS SLIDE 4')
+        draw_instruction4()
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry

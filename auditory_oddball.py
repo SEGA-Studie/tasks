@@ -290,7 +290,6 @@ def send_trigger(trigger_name):
 
 # draw instruction slide 1
 def draw_instruction1(background_color=background_color_rgb):
-
     if background_color is not background_color_rgb:
         background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
         background_rect.draw()
@@ -302,12 +301,10 @@ def draw_instruction1(background_color=background_color_rgb):
         units='pix',
         wrapWidth = 900,
         height=size_fixation_cross_in_pixels)
-
     instruction1.draw()
 
 # draw instruction slide 2
 def draw_instruction2(background_color=background_color_rgb):
-
     if background_color is not background_color_rgb:
         background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
         background_rect.draw()
@@ -319,8 +316,25 @@ def draw_instruction2(background_color=background_color_rgb):
         units='pix',
         wrapWidth = 900,
         height=size_fixation_cross_in_pixels)
-
     instruction2.draw()
+
+# draw instruction slide 3
+def draw_instruction3(background_color=background_color_rgb):
+
+    if background_color is not background_color_rgb:
+        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
+        background_rect.draw()
+
+    instruction3 = visual.TextStim(
+        win = mywin,
+        text = "Das Experiment ist jetzt beendet.\nBitte bleibe still noch sitzen.",
+        color = 'black',
+        units = 'pix',
+        wrapWidth = 900,
+        height = size_fixation_cross_in_pixels)
+    instruction3.draw()
+
+
 
 # draw a fixation cross from lines
 def draw_fixcross(background_color=background_color_rgb):
@@ -628,7 +642,7 @@ def present_ball(which_phase):
 
 """EXPERIMENTAL DESIGN """
 
-phase_sequence = ['instruction1','baseline_calibration','oddball_block','baseline','oddball_block','baseline','instruction2','manipulation_block','baseline','oddball_block','baseline','oddball_block','baseline']
+phase_sequence = ['instruction1','baseline_calibration','oddball_block','baseline','oddball_block','baseline','instruction2','manipulation_block','baseline','oddball_block','baseline','oddball_block','baseline', 'instruction3']
 phase_handler = data.TrialHandler(phase_sequence,nReps = 1, method='sequential') #trial handler calls the sequence and displays it randomized
 exp.addLoop(phase_handler) #add loop of block to experiment handler - any data that is collected  will be transfered to experiment handler automatically
 
@@ -646,15 +660,23 @@ for phase in phase_handler:
     block_counter += 1
 
     if phase == 'instruction1':
+        print('SHOW INSTRUCTIONS SLIDE 1')
         draw_instruction1()
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry()
 
     if phase == 'instruction2':
+        print('SHOW INSTRUCTIONS SLIDE 2')
         draw_instruction2()
         mywin.flip()
-        #core.wait(10)
+        keys = event.waitKeys(keyList = ["space"])
+        exp.nextEntry 
+
+    if phase == 'instruction3':
+        print('SHOW INSTRUCTIONS SLIDE 3')
+        draw_instruction3()
+        mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry 
 
