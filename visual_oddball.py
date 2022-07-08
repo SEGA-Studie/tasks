@@ -219,7 +219,7 @@ def draw_instruction2(background_color = background_color_rgb):
 
     instruction2 = visual.TextStim(
         win = mywin,
-        text = "Gleich startet die Übung.\nEs werden Kreise auf dem Bildschirm erscheinen. Weiter geht es mit der Leertaste.",
+        text = "Gleich startet die Übung.\nEs werden Kreise auf dem Bildschirm erscheinen.\nWeiter geht es mit der Leertaste.",
         color = 'black',
         units = 'pix',
         wrapWidth = 900,
@@ -613,7 +613,7 @@ for phase in phase_handler:
             print("gaze position: ", tracker.getPosition())
             # stimulus presentation
             send_trigger('stimulus')
-            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = trial, salience = u)
+            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = trial, salience = s)
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(ISI)
         exp.nextEntry()
