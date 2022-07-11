@@ -288,53 +288,20 @@ def send_trigger(trigger_name):
     if not trigger_name_found:
         print('trigger name is not defined: ' + trigger_name)
 
-# draw instruction slide 1
-def draw_instruction1(background_color=background_color_rgb):
+# Draw instruction slides:
+def draw_instruction(text, background_color = background_color_rgb):
     if background_color is not background_color_rgb:
         background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
         background_rect.draw()
 
-    instruction1 = visual.TextStim(
-        win=mywin,
-        text="Das Experiment beginnt jetzt.\nBitte bleibe still sitzen und\nschaue auf das Kreuz in der Mitte.\n\n Weiter mit der Leertaste.",
-        color='black',
-        units='pix',
-        wrapWidth = 900,
-        height=size_fixation_cross_in_pixels)
-    instruction1.draw()
-
-# draw instruction slide 2
-def draw_instruction2(background_color=background_color_rgb):
-    if background_color is not background_color_rgb:
-        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
-        background_rect.draw()
-
-    instruction2 = visual.TextStim(
-        win=mywin,
-        text="Gleich wirst du einen farbigen Kreis sehen.\nBitte drücke dann fest das Kraftmessgerät.\n\nMit der Leertaste geht es weiter.",
-        color='black',
-        units='pix',
-        wrapWidth = 900,
-        height=size_fixation_cross_in_pixels)
-    instruction2.draw()
-
-# draw instruction slide 3
-def draw_instruction3(background_color=background_color_rgb):
-
-    if background_color is not background_color_rgb:
-        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
-        background_rect.draw()
-
-    instruction3 = visual.TextStim(
+    instruction_slide = visual.TextStim(
         win = mywin,
-        text = "Das Experiment ist jetzt beendet.\nBitte bleibe still noch sitzen.",
+        text = text,
         color = 'black',
         units = 'pix',
         wrapWidth = 900,
         height = size_fixation_cross_in_pixels)
-    instruction3.draw()
-
-
+    instruction_slide.draw()
 
 # draw a fixation cross from lines
 def draw_fixcross(background_color=background_color_rgb, cross_color = 'black'):
@@ -660,22 +627,25 @@ for phase in phase_handler:
     block_counter += 1
 
     if phase == 'instruction1':
+        text_1 = "Das Experiment beginnt jetzt.\nBitte bleibe still sitzen und\nschaue auf das Kreuz in der Mitte.\n\n Weiter mit der Leertaste."
         print('SHOW INSTRUCTIONS SLIDE 1')
-        draw_instruction1()
+        draw_instruction(text = text_1)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry()
 
     if phase == 'instruction2':
+        text_2 = "Gleich wirst du einen farbigen Kreis sehen.\nBitte drücke dann fest das Kraftmessgerät.\n\nMit der Leertaste geht es weiter."
         print('SHOW INSTRUCTIONS SLIDE 2')
-        draw_instruction2()
+        draw_instruction(text = text_2)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry 
 
     if phase == 'instruction3':
+        text_3 = "Das Experiment ist jetzt beendet.\nBitte bleibe still noch sitzen."
         print('SHOW INSTRUCTIONS SLIDE 3')
-        draw_instruction3()
+        draw_instruction(text = text_3)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry 
