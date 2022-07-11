@@ -337,16 +337,16 @@ def draw_instruction3(background_color=background_color_rgb):
 
 
 # draw a fixation cross from lines
-def draw_fixcross(background_color=background_color_rgb):
+def draw_fixcross(background_color=background_color_rgb, cross_color = 'black'):
 
     if background_color is not background_color_rgb:
         background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
         background_rect.draw()
 
-    line1 = visual.Line(win=mywin, units='pix', lineColor='black') #define line object
+    line1 = visual.Line(win=mywin, units='pix', lineColor = cross_color) #define line object
     line1.start = [-(size_fixation_cross_in_pixels/2), 0]
     line1.end = [+(size_fixation_cross_in_pixels/2), 0]
-    line2 = visual.Line(win=mywin, units='pix', lineColor='black') #define line object
+    line2 = visual.Line(win=mywin, units='pix', lineColor = cross_color) #define line object
     line2.start = [0, -(size_fixation_cross_in_pixels/2)]
     line2.end = [0, +(size_fixation_cross_in_pixels/2)]
     line1.draw()
@@ -512,7 +512,7 @@ def check_gaze_offset(gaze_position):
     return offset_boolean
 
 #fixation cross - and check for "data available" and "screen center gaze"
-def fixcross_gazecontingent(duration_in_seconds, background_color=background_color_rgb):
+def fixcross_gazecontingent(duration_in_seconds, background_color=background_color_rgb, cross_color = 'black'):
     #translate duration to number of frames
     number_of_frames = round(duration_in_seconds/refresh_rate)
     timestamp = getTime()
@@ -558,7 +558,7 @@ def fixcross_gazecontingent(duration_in_seconds, background_color=background_col
                 gaze_position = tracker.getPosition() #get new gaze data
 
         #draw fixation cross -
-        draw_fixcross(background_color)
+        draw_fixcross(background_color, cross_color)
         mywin.flip()
 
     #generate output info
@@ -944,7 +944,7 @@ for phase in phase_handler:
 
                 #present baseline - but with black background
                 send_trigger('baseline_blackslide')
-                [stimulus_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(baseline_duration, background_color = black_slide)
+                [stimulus_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(baseline_duration, background_color = black_slide, cross_color = 'grey')
 
                 #collect global data --> saved to csv
                 phase_handler.addData('phase', phase)
