@@ -44,7 +44,7 @@ print(trials_data_folder)
 print(eyetracking_data_folder)
 
 # define experimental variables
-testmode = False # TRUE = mimicks an Eye-Tracker by Mouse movement, FALSE = eye-tracking hardware is required
+testmode = True # TRUE = mimicks an Eye-Tracker by Mouse movement, FALSE = eye-tracking hardware is required
 dialog_screen = 1 # input dialgue boxes are presented on external screen 1
 presentation_screen = 0 # stimuli are presented on internal screen 0
 
@@ -76,7 +76,7 @@ parallel_port_adress = 0x03FF8 #dont quote it - CAVE: correct port needs to be i
 
 
 #dictionary containing experimental settings that will be stored automatically for each trial
-settings = {} 
+settings = {}
 
 #infos in dialog box - added to dictonary with defaults
 settings['id'] = 123 #default testing value
@@ -119,11 +119,7 @@ if random_number >= 0.5:
     # exp.addData('oddball_frequency',sound_one_in_Hz) #save condition in dictonary - only for this trial
 
 
-#DEIFNE MONITOR AND CREATE DISPLAY
-#homeoffice PC:
-# mon = monitors.Monitor(name = 'default',
-#                        width = 70, #in cm
-#                        distance = 65) #in cm, distance from screen
+#DEFINE MONITOR AND CREATE DISPLAY
 
 #monitor EEG lab already saved via psyhopy monitor manager
 mon = monitors.Monitor(name = 'eizo_eyetracker', #saved with psychopy monitor monager
@@ -187,21 +183,22 @@ tracker.setRecordingState(True)
     # i.e. list position 2 will send a trigger with value "S2"
 trigger_name_list = ['PLACEHOLDER', #0
                      'trial', #1 -
-                     'stimulus', #2 -
-                     'ISI', #3 -
-                     'baseline', #4 -
-                     'manipulation_squeeze', #5 -
-                     'manipulation_relax', #6 -
-                     'experiment_start', #7 -
-                     'experiment_end', #8 -
-                     'pause_initiated', #9 -
-                     'pause_ended', #10 -
-                     'experiment_aborted', #11 -
-                     'baseline_calibration', #12 -
-                     'baseline_whiteslide', #13 -
-                     'baseline_blackslide' #14 -
-                     'oddball_block', #15 -
-                     'manipulation_block'] #16 -
+                     'standard', #2 -
+                     'oddball', #3 -
+                     'ISI', #4 -
+                     'baseline', #5 -
+                     'manipulation_squeeze', #6 -
+                     'manipulation_relax', #7 -
+                     'experiment_start', #8 -
+                     'experiment_end', #9 -
+                     'pause_initiated', #10 -
+                     'pause_ended', #11 -
+                     'experiment_aborted', #12 -
+                     'baseline_calibration', #13 -
+                     'baseline_whiteslide', #14 -
+                     'baseline_blackslide', #15 -
+                     'oddball_block', #16 -
+                     'manipulation_block'] #17 -
 
 print(trigger_name_list)
 
@@ -640,7 +637,7 @@ for phase in phase_handler:
         draw_instruction(text = text_2)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
-        exp.nextEntry 
+        exp.nextEntry
 
     if phase == 'instruction3':
         text_3 = "Das Experiment ist jetzt beendet.\nBitte bleibe still noch sitzen."
@@ -648,7 +645,7 @@ for phase in phase_handler:
         draw_instruction(text = text_3)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
-        exp.nextEntry 
+        exp.nextEntry
 
     if phase == 'oddball_block':
         # # problem with this randomization - oddball might not occur
@@ -696,7 +693,7 @@ for phase in phase_handler:
             print("gaze position: ",tracker.getPosition())
 
             #stimulus presentation
-            send_trigger('stimulus')
+            send_trigger(trial)
             actual_stimulus_duration = present_stimulus(stimulus_duration_in_seconds,trial)
 
             #ISI
