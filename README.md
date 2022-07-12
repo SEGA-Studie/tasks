@@ -5,7 +5,7 @@ This study consists of two oddball tasks:
 * an Auditory Oddball Task (auditory_oddball.py)
 * a Visual Oddball Task (visual_oddball.py)
 
-During both tasks, pupil dilation is measured via eye tracker and parallel port triggers are sent to an EEG recording PC.
+During both tasks, pupil dilation is measured via eye tracker and parallel port triggers are sent to an EEG recording PC. Several baseline phases are used to determine tonic pupil size. 
 
 ## Install Instructions
 NOTE: inpout32.dll file is required in experiment folder (driver file) to send parallel port triggers
