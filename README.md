@@ -61,6 +61,9 @@ The task is used to manipulate Locus-Coeruleus-Norepinephrine (LC-NE) activity. 
 12. oddball block
 13. baseline phase
 
+For yellow: Luminance of manipulation stimuli is matched. Luminance formula: 0.3 R + 0.59 G + 0.11 B -> 0.2 + 0.1 -> luminance = = 0.119; see:  https://www.w3.org/TR/AERT/#color-contrast.
+For blue: Luminance matched to squeeze; luminance formula: 0.3 R + 0.59 G + 0.11 B --> luminance = 0.11; see: https://www.w3.org/TR/AERT/#color-contrast.
+
 ## The Visual Oddball Task
 The task is used and to observe effects of task utility and stimulus salience. It contains independent manipulations of both. A frequent purple circle is presented with a probability of 80% while an infrequent smaller purple circle (oddball) is presented with a probability of 20%. 
 

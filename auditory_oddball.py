@@ -1,41 +1,30 @@
 
 '''AUDITORY ODDBALL TASK'''
-# oddball sound file is presented with specific probability
-# pupil dialtion is measured with eye tracker throughout
-# parallel port triggers are sent to EEG Recording PC
-# includes several baseline phase to determine tonic pupil size
-# contains manipulation  according to Mather et al., 2020
+# For further information see README.md.
 
-
-"""LOAD MODULES"""
-from os import environ
-from textwrap import wrap #hide messages in console from pygame
-environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' #hide messages in console from pygame
-
-from psychopy import visual, core, event, clock, data, gui, monitors, parallel #psychopy libararies
-#from psychopy.tools.filetools import fromFile, toFile #filesystem - could be redundant?
-import random, time, sys, numpy #core libraries
-import psychtoolbox as ptb #sound processing via ptb
-# from ctypes import windll #parallelport driver
-import tobii_research #eye-tracking SDK
-
-#import audio with prefrered sound class
+'''LOAD MODULES'''
+# Core libraries:
+from psychopy import visual, core, event, clock, data, gui, monitors, parallel
+import random, time, numpy
+# For controlling eye tracker and eye-tracking SDK:
+import tobii_research
+from psychopy.iohub import launchHubServer
+from psychopy.core import getTime, wait
+# For getting keyboard input:
+from psychopy.hardware import keyboard
+# For playing sound:
 from psychopy import prefs
 prefs.hardware['audioLib'] = ['PTB'] #PTB described as highest accuracy sound class
 from psychopy import sound
-
-#import iohub that controls eyetracker
-from psychopy.iohub import launchHubServer
-from psychopy.core import getTime, wait
-
-#read keyboard
-from psychopy.hardware import keyboard
-
-#Library for managing paths.
+import psychtoolbox as ptb #sound processing via ptb
+# For managing paths:
 from pathlib import Path
+# Miscellaneous: Hide messages in console from pygame:
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 '''SETUP'''
-#path to data
+# Path to output data:
 path_to_data = Path("Desktop", "tasks", "data", "auditory_oddball").resolve()
 trials_data_folder = Path(path_to_data, 'trialdata')
 eyetracking_data_folder = Path(path_to_data, 'eyetracking')
@@ -43,46 +32,54 @@ eyetracking_data_folder = Path(path_to_data, 'eyetracking')
 print(trials_data_folder)
 print(eyetracking_data_folder)
 
-# define experimental variables
-testmode = True # TRUE = mimicks an Eye-Tracker by Mouse movement, FALSE = eye-tracking hardware is required
-dialog_screen = 1 # input dialgue boxes are presented on external screen 1
-presentation_screen = 0 # stimuli are presented on internal screen 0
+# Testmode.
+# TRUE mimics an eye-tracker by mouse movement, FALSE = eye-tracking hardware is required.
+testmode = False
 
-# NOTE: oddball chance (currently 1/5) is defined below in stimulus_sequence
+# Experimental settings:
+# Input dialgue boxes are presented on external screen 1.
+dialog_screen = 1
+# Stimuli are presented on internal screen 0.
+presentation_screen = 0 
 number_of_trials = 10 #should be multiplier of 5 - target 100
-stimulus_duration_in_seconds = 0.1 #how long sounds are played
-sound_one_in_Hz = 500 #if this is oddball or standard is defined below
-sound_two_in_Hz = 750 #if this is oddball or standard is defined below
-size_fixation_cross_in_pixels = 60 #also defines standard stimulus size
-ISI_interval = [1800, 2000] # inter stimulus interval, randomly varies between value0 and value1
-gaze_offset_cutoff = 3 * size_fixation_cross_in_pixels # when system will output a gze offsett from th center
-background_color_rgb = (0, 0, 0) #[0, 0 ,0] is gray as float [-1,1]
+stimulus_duration_in_seconds = 0.1
+# If oddball or standrad stimulus is defined below.
+sound_one_in_Hz = 500 
+sound_two_in_Hz = 750 
+size_fixation_cross_in_pixels = 60
+# Inter Stimulus Interval (ISI) randomly varies between value0 and value1.
+ISI_interval = [1800, 2000] 
+# Sensitivity: Warning of gaze offset from the center.  
+gaze_offset_cutoff = 3 * size_fixation_cross_in_pixels
+# [0, 0 , 0] is gray as float [-1, 1]
+background_color_rgb = (0, 0, 0) 
 white_slide = 'white'
 black_slide = 'black'
-
-manipulation_repetition = 1 #in seconds; TARGET 5
-baseline_duration = 5 #in seconds; presentation duration of baseline screen; TARGET 10
-squeeze_phase_duration = 6 #TARGET 18; paramete of manipulation
-relax_phase_duration = 10 #TARGET 60, parameter of manipulation
-squeeze_ball_color = (50, 25, 0) # = pale yellow; luminance matched to relax; luminance formula: 0.3 R + 0.59 G + 0.11 B --> 0.2 + 0.1 --> luminance = = 0.119; see:  https://www.w3.org/TR/AERT/#color-contrast
-relax_ball_color = (0, 0, 255) # = pale blue; luminance matched to squeeze; luminance formula: 0.3 R + 0.59 G + 0.11 B --> luminance = 0.11; see: https://www.w3.org/TR/AERT/#color-contrast
-
-baseline_calibration_repetition = 1 #target 1; how often baeline should be assessed by blck and white screens at the beginning of the experiment
-no_data_warning_cutoff = 0.5 #500ms - after which time of no data detection warning should be displayed on screen
-
-#EEG trigger variables
-pulse_duration = 0.01 #10ms duration of trigger signal
-parallel_port_adress = 0x03FF8 #dont quote it - CAVE: correct port needs to be identified - use standalone "Parallel Port Tester programm" to identify it
-
-
-#dictionary containing experimental settings that will be stored automatically for each trial
+manipulation_repetition = 1 # TARGET: 5
+# Presentation duration of baseline screen, in seconds.
+baseline_duration = 5 # TARGET: 10
+# The two parameter of manipulatin:
+squeeze_phase_duration = 6 # TARGET: 18
+relax_phase_duration = 10 # TARGET: 60 
+squeeze_ball_color = (50, 25, 0) # yellow
+relax_ball_color = (0, 0, 255) # blue
+baseline_calibration_repetition = 1 # TARGET: 1
+# After 500 ms the no_data detection warning should be displayed on the screen.
+no_data_warning_cutoff = 0.5
+# Setings are stored automatically for each trial.
 settings = {}
 
-#infos in dialog box - added to dictonary with defaults
+# EEG trigger variables. 10 ms duration of trigger signal.
+pulse_duration = 0.01
+
+# Don't quote it! Correct port needs to be identified.
+# Use standalone "Parallel Port Tester programm" to identify it.
+parallel_port_adress = 0x03FF8
+
+# Presenting a dialog box. Infos are added to settings. 
 settings['id'] = 123 #default testing value
 settings['group'] = ['ASD', 'TD']
 
-# - present a dialogue to change params
 dlg = gui.DlgFromDict(settings,title='auditory oddball')
 if dlg.OK:
     print('EXPERIMENT IS STARTED')
@@ -90,53 +87,53 @@ if dlg.OK:
 else:
     core.quit()  # the user hit cancel so exit
 
-# - define a file name for the saved data
+# Name for output data.
 fileName = str(settings['id']) + '_' + data.getDateStr(format="%Y-%m-%d-%H%M")
 
-#define experiment handler - automatically saves experiment data - also corrdinates trial handlers, see below
+# Expriment handler saves experiment data automatically.
 exp = data.ExperimentHandler(
     name="auditory_oddball",
     version='0.1',
-    extraInfo = settings, #experiment info
-    dataFileName = str(trials_data_folder / fileName), # where to save the data
+    extraInfo = settings,
+    dataFileName = str(trials_data_folder / fileName), 
     )
 
-#prepare sound presentation and define condition (balanced across groups)
+# Two different sound frequencies (conditions) are balanced across groups and
+# saved in the setings dictionary.
 random_number = random.random()
 if random_number < 0.5:
     standard_sound = sound.Sound(sound_one_in_Hz)
     oddball_sound = sound.Sound(sound_two_in_Hz)
     print('oddball sound is',sound_two_in_Hz,'Hz')
-    settings['standard_frequency'] = sound_one_in_Hz #save condition in dictonary
-    settings['oddball_frequency'] = sound_two_in_Hz #save condition in dictonary
-    # exp.addData('oddball_frequency',sound_two_in_Hz) #save condition in dictonary - only for this trial
+    settings['standard_frequency'] = sound_one_in_Hz 
+    settings['oddball_frequency'] = sound_two_in_Hz 
+    # exp.addData('oddball_frequency',sound_two_in_Hz) 
 if random_number >= 0.5:
     standard_sound = sound.Sound(sound_two_in_Hz)
     oddball_sound = sound.Sound(sound_one_in_Hz)
     print('oddball sound is',sound_one_in_Hz,'Hz')
-    settings['standard_frequency'] = sound_two_in_Hz #save condition in dictonary
-    settings['oddball_frequency'] = sound_one_in_Hz #save condition in dictonary
-    # exp.addData('oddball_frequency',sound_one_in_Hz) #save condition in dictonary - only for this trial
+    settings['standard_frequency'] = sound_two_in_Hz 
+    settings['oddball_frequency'] = sound_one_in_Hz 
+    # exp.addData('oddball_frequency',sound_one_in_Hz)
 
+# Monitor parameters are adapted to presentation PC.
+# Name is saved with PsychoPy monitor manager.
+# Distance is from screenin cm.
+mon = monitors.Monitor(
+    name = 'eizo_eyetracker',
+    width = 29.6,
+    distance = 65) 
 
-#DEFINE MONITOR AND CREATE DISPLAY
-
-#monitor EEG lab already saved via psyhopy monitor manager
-mon = monitors.Monitor(name = 'eizo_eyetracker', #saved with psychopy monitor monager
-                       width = 29.6, #in cm
-                       distance = 65) #in cm, distance from screen
-
-#create display window
-#CAVE: Avoid integrated graphics for experiment computers wherever possible as no accurate frame timing
-#CAVE: set Windows scaling to 100% - otherwise onscreen units will not get right
-#NOTE: experiment screen will be FUllHD, thus testscreen is specified accordingly
-mywin = visual.Window(size=[1920,1080], #screen resolution
-                      #pos=[0,0],
-                      fullscr=True,
-                      monitor=mon,
-                      color = background_color_rgb,
-                      screen=presentation_screen,
-                      units="pix") #unit changed to pixel so that eye tracker outputs pixel on presentation screen
+# Create display window.
+# Unit was changed to pixel so that eye trcker outputs pixel on presentation screen.
+# Screen resolution is 1920/1080.
+mywin = visual.Window(
+    size = [1920,1080],           
+    fullscr=True,
+    monitor = mon,
+    color = background_color_rgb,
+    screen = presentation_screen,
+    units = "pix")
 
 refresh_rate = mywin.monitorFramePeriod #get monitor refresh rate in seconds
 print('monitor refresh rate: ' + str(round(refresh_rate, 3)) + ' seconds')
