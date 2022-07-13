@@ -256,6 +256,21 @@ def draw_instruction4(background_color = background_color_rgb):
         height = size_fixation_cross_in_pixels)
     instruction4.draw()
 
+# Draw slide_utility:
+def draw_utility_slide(background_color = background_color_rgb):
+    if background_color is not background_color_rgb:
+        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
+        background_rect.draw()
+
+    utility_slide = visual.TextStim(
+        win = mywin,
+        text = "Im folgenden Block kannst du\n für jede schnelle Reaktionen\n10 Cent gewinnen.",
+        color = 'black',
+        units = 'pix',
+        wrapWidth = 900,
+        height = size_fixation_cross_in_pixels)
+    utility_slide.draw()
+
 # Draw fixation cross from lines:
 def draw_fixcross(background_color=background_color_rgb, cross_color = 'black'):
     if background_color is not background_color_rgb:
@@ -590,7 +605,7 @@ for phase in phase_handler:
         # Common oddball setup.
         oddball_parameters = phase.split('_')[1] # remove the 'oddball_' portion of the phase name
         (u, s) = oddball_parameters # u = utility; s = slience
-
+        
         # Sequence for trial handler with 1/5 chance for an oddball.
         stimulus_sequence = ['standard','standard','standard','standard','oddball']
 
@@ -601,6 +616,12 @@ for phase in phase_handler:
         # Onset of oddball block:
         send_trigger('oddball_block')
         print('START OF ODDBALL BLOCK')
+
+        if s == '+':
+            print('SHOW UTILITY SLIDE')
+            draw_utility_slide()
+            mywin.flip()
+            core.wait(2)  
 
         for trial in trials:
             send_trigger('trial')
