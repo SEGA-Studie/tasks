@@ -143,20 +143,21 @@ tracker.setRecordingState(True)
 # i.e. list position 2 will send a trigger with value "S2".
 trigger_name_list = ['PLACEHOLDER', #0
                      'trial', #1 -
-                     'stimulus', #2 -
-                     'ISI', #3 -
-                     'baseline', #4 -
-                     'experiment_start', #7 -
-                     'experiment_end', #8 -
-                     'pause_initiated', #9 -
-                     'pause_ended', #10 -
-                     'experiment_aborted', #11 -
-                     'baseline_calibration', #12 -
-                     'baseline_whiteslide', #13 -
-                     'baseline_blackslide', #14 -
-                     'oddball_block', #15 -
+                     'standard', #2 -
+                     'oddball', #3 -
+                     'ISI', #4-
+                     'baseline', #5 -
+                     'experiment_start', #6 -
+                     'experiment_end', #7 -
+                     'pause_initiated', #8 -
+                     'pause_ended', #9 -
+                     'experiment_aborted', #10 -
+                     'baseline_calibration', #11 -
+                     'baseline_whiteslide', #12 -
+                     'baseline_blackslide', #13 -
+                     'oddball_block', #14 -
                      'manipulation_block'
-                     ] #16 -
+                     ]
 
 print(trigger_name_list)
 
@@ -633,7 +634,7 @@ for phase in phase_handler:
             print("ISI: ", ISI)
             print("gaze position: ", tracker.getPosition())
             # stimulus presentation
-            send_trigger('stimulus')
+            send_trigger('trial')
             actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = trial, salience = s)
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(ISI)
