@@ -32,7 +32,7 @@ print(eyetracking_data_folder)
 
 # Testmode.
 # TRUE mimicks an eye-Ttracker by mouse movement, FALSE = eye-tracking hardware is required.
-testmode = False
+testmode = True
 
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
@@ -418,6 +418,15 @@ def check_keypress():
     pause_time = round(pause_time,3)
     return pause_time
 
+def check_response():
+    # print('checking keypress response')
+    responses = kb.getKeys([' '], waitRelease = True)
+    timestamp_response = clock.getTime()
+    if ' ' in responses:
+        for response in responses:
+            print('RESPONSE: [{}] {} ({})'.format(timestamp_response, response.name, response.rt))
+        return(responses, timestamp_response)
+
 def check_nodata(gaze_position):
     if gaze_position == None:
         nodata_boolean = True
@@ -447,6 +456,12 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     nodata_duration = 0 
     # Present cross for number of frames:
     for frameN in range(number_of_frames):
+        # Check for response during oddball blocks:
+        keypress = check_response()
+        if keypress:
+            keys, timestamp = keypress
+            print('check_response returned keypresses: {} [{}]'.format(keys, timestamp))
+
         # Check for keypress
         pause_duration += check_keypress()
         gaze_position = tracker.getPosition()
