@@ -373,14 +373,17 @@ def check_keypress():
     pause_time = round(pause_time,3)
     return pause_time
 
+# Recording space bar presses:
 def check_response():
-    # print('checking keypress response')
+    # In the keybord module, the space bar is coded as space(' '), 
+    # other than in the event module where it is coded by the word 'space'.
     responses = kb.getKeys([' '], waitRelease = True)
     timestamp_response = clock.getTime()
     if ' ' in responses:
         for response in responses:
+            response_variable = timestamp_response, response.name, response.rt
             print('RESPONSE: [{}] {} ({})'.format(timestamp_response, response.name, response.rt))
-        return(responses, timestamp_response)
+            print(response_variable)
 
 def check_nodata(gaze_position):
     if gaze_position == None:
@@ -411,11 +414,8 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     nodata_duration = 0 
     # Present cross for number of frames:
     for frameN in range(number_of_frames):
-        # Check for response during oddball blocks:
-        keypress = check_response()
-        if keypress:
-            keys, timestamp = keypress
-            print('check_response returned keypresses: {} [{}]'.format(keys, timestamp))
+        # Check for space bar presses during oddball blocks:
+        check_response()
         # Check for keypress
         pause_duration += check_keypress()
         gaze_position = tracker.getPosition()
@@ -611,7 +611,14 @@ for phase in phase_handler:
             actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = trial, salience = s)
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(ISI)
-        exp.nextEntry()
+            # Save data in .csv file:
+            phase_handler.addData('phase', phase)
+            phase_handler.addData('block_counter', block_counter)
+            trials.addData('oddball_trial_counter', oddball_trial_counter)
+            trials.addData('trial', trial)
+            
+            oddball_trial_counter += 1
+            exp.nextEntry()
 
     if phase == 'baseline':
         send_trigger('baseline')
