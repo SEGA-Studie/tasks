@@ -32,7 +32,7 @@ print(eyetracking_data_folder)
 
 # Testmode.
 # TRUE mimicks an eye-Ttracker by mouse movement, FALSE = eye-tracking hardware is required.
-testmode = True
+testmode = False
 
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
@@ -197,65 +197,20 @@ def send_trigger(trigger_name):
     if not trigger_name_found:
          print('trigger name is not defined: ' + trigger_name)
 
-# Draw instruction slide 1:
-def draw_instruction1(background_color = background_color_rgb):
+# Draw instruction slides:
+def draw_instruction(text, background_color = background_color_rgb):
     if background_color is not background_color_rgb:
         background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
         background_rect.draw()
 
-    instruction1 = visual.TextStim(
+    instruction_slide = visual.TextStim(
         win = mywin,
-        text = "Das Experiment beginnt jetzt.\nBitte bleibe still sitzen und\nschaue auf das Kreuz in der Mitte.\n\n Weiter mit der Leertaste.",
+        text = text,
         color = 'black',
         units = 'pix',
         wrapWidth = 900,
         height = size_fixation_cross_in_pixels)
-    instruction1.draw()
-
-# Draw instruction slide 2:
-def draw_instruction2(background_color = background_color_rgb):
-    if background_color is not background_color_rgb:
-        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
-        background_rect.draw()
-
-    instruction2 = visual.TextStim(
-        win = mywin,
-        text = "Gleich startet die Übung.\nEs werden Kreise auf dem Bildschirm erscheinen.\nWeiter geht es mit der Leertaste.",
-        color = 'black',
-        units = 'pix',
-        wrapWidth = 900,
-        height = size_fixation_cross_in_pixels)
-    instruction2.draw()
-
-# Draw instruction slide 3:
-def draw_instruction3(background_color = background_color_rgb):
-    if background_color is not background_color_rgb:
-        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
-        background_rect.draw()
-
-    instruction3 = visual.TextStim(
-        win = mywin,
-        text = "Die Übung ist beendet.\nBitte bleibe still sitzen.\n\nGleich beginnt die Aufgabe.",
-        color = 'black',
-        units = 'pix',
-        wrapWidth = 900,
-        height = size_fixation_cross_in_pixels)
-    instruction3.draw()
-
-# Draw instruction slide 4:
-def draw_instruction4(background_color = background_color_rgb):
-    if background_color is not background_color_rgb:
-        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
-        background_rect.draw()
-
-    instruction4 = visual.TextStim(
-        win = mywin,
-        text = "Das Experiment ist jetzt beendet.\nBitte bleibe noch still sitzen.",
-        color = 'black',
-        units = 'pix',
-        wrapWidth = 900,
-        height = size_fixation_cross_in_pixels)
-    instruction4.draw()
+    instruction_slide.draw()
 
 # Draw slide_utility:
 def draw_utility_slide(background_color = background_color_rgb):
@@ -461,7 +416,6 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
         if keypress:
             keys, timestamp = keypress
             print('check_response returned keypresses: {} [{}]'.format(keys, timestamp))
-
         # Check for keypress
         pause_duration += check_keypress()
         gaze_position = tracker.getPosition()
@@ -590,29 +544,33 @@ for phase in phase_handler:
     block_counter += 1
 
     if phase == 'instruction1':
+        text_1 = "Das Experiment beginnt jetzt.\nBitte bleibe still sitzen und\nschaue auf das Kreuz in der Mitte.\n\n Weiter mit der Leertaste."
         print('SHOW INSTRUCTIONS SLIDE 1')
-        draw_instruction1()
+        draw_instruction(text = text_1)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry
     
     if phase == 'instruction2':
+        text_2 = "Gleich startet die Übung.\nEs werden Kreise auf dem Bildschirm erscheinen.\nWeiter geht es mit der Leertaste."
         print('SHOW INSTRUCTIONS SLIDE 2')
-        draw_instruction2()
+        draw_instruction(text = text_2)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry
 
     if phase == 'instruction3':
+        text_3 = "Die Übung ist beendet.\nBitte bleibe still sitzen.\n\nGleich beginnt die Aufgabe."
         print('SHOW INSTRUCTIONS SLIDE 3')
-        draw_instruction3()
+        draw_instruction(text = text_3)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry
     
     if phase == 'instruction4':
+        text_4 = "Das Experiment ist jetzt beendet.\nBitte bleibe noch still sitzen."
         print('SHOW INSTRUCTIONS SLIDE 4')
-        draw_instruction4()
+        draw_instruction(text = text_4)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
         exp.nextEntry
