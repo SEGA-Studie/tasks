@@ -589,11 +589,11 @@ for phase in phase_handler:
         send_trigger('oddball_block')
         print('START OF ODDBALL BLOCK')
 
-        if s == '+':
+        if u == '+':
             print('SHOW UTILITY SLIDE')
             draw_utility_slide()
             mywin.flip()
-            core.wait(2)  
+            core.wait(7)  
 
         for trial in trials:
             send_trigger('trial')
