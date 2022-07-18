@@ -17,6 +17,7 @@ from pathlib import Path
 # Miscellaneous: Hide messages in console from pygame:
 from os import environ 
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' 
+import statistics
 
 print("This is visual oddball")
 
@@ -36,7 +37,7 @@ testmode = False
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
 number_of_repetitions = 2
-number_of_practice_trials = 25
+number_of_practice_trials = 20
 stimulus_duration_in_seconds = 0.075
 standard_ball_color = (128, 0, 128)
 size_fixation_cross_in_pixels = 60
@@ -399,7 +400,7 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     gaze_offset_duration = 0
     pause_duration = 0
     nodata_duration = 0 
-    all_responses = list()
+    all_responses = list() # contains all space bar presses in a single trial
     # Present cross for number of frames:
     for frameN in range(number_of_frames):
         # Check for space bar presses during oddball blocks:
@@ -507,15 +508,26 @@ def define_ISI_interval():
 # Loop of block is added to experiment handler.
 # Any data that is collected  will be transfered to experiment handler automatically.
 # Oddballs are defined as strings. 1st place is u, 2nd is s:
-oddballs = ['oddball_++', 'oddball_+-', 'oddball_-+', 'oddball_--'] 
+oddballs = ['oddball_++', 'oddball_+-', 'oddball_-+', 'oddball_--']
+practice_oddballs = oddballs
+
 random.shuffle(oddballs)
+random.shuffle(practice_oddballs)
+
 phase_sequence = [
     'instruction1',
     'baseline_calibration',
     'instruction2',
-    #'practice_trials',
     'baseline',
+    practice_oddballs[0],
+    'baseline',
+    practice_oddballs[1],
+    'baseline',
+    practice_oddballs[2],
+    'baseline',
+    practice_oddballs[3],
     'instruction3',
+    'baseline',
     oddballs[0],
     'baseline', 
     oddballs[1],
@@ -543,7 +555,7 @@ for phase in phase_handler:
 
     if phase == 'instruction1':
         text_1 = "Das Experiment beginnt jetzt.\nBitte bleibe still sitzen und\nschaue auf das Kreuz in der Mitte.\n\n Weiter mit der Leertaste."
-        print('SHOW INSTRUCTIONS SLIDE 1')
+        print('SHOW INSTRUCTION SLIDE 1')
         draw_instruction(text = text_1)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
@@ -559,7 +571,7 @@ for phase in phase_handler:
 
     if phase == 'instruction3':
         text_3 = "Die Übung ist beendet.\nBitte bleibe still sitzen.\n\nGleich beginnt die Aufgabe."
-        print('SHOW INSTRUCTIONS SLIDE 3')
+        print('SHOW INSTRUCTION SLIDE 3')
         draw_instruction(text = text_3)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
@@ -567,7 +579,7 @@ for phase in phase_handler:
     
     if phase == 'instruction4':
         text_4 = "Das Experiment ist jetzt beendet.\nBitte bleibe noch still sitzen."
-        print('SHOW INSTRUCTIONS SLIDE 4')
+        print('SHOW INSTRUCTION SLIDE 4')
         draw_instruction(text = text_4)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
@@ -655,14 +667,15 @@ for phase in phase_handler:
         baseline_trial_counter += 1
         exp.nextEntry()
 
-    if phase == 'practice_trials':
-        # Common oddball setup.
-        oddball_parameters = phase.split('_')[1] # remove the 'oddball_' portion of the phase name
-        (u, s) = oddball_parameters # u = utility; s = slience
+    if phase.startswith('practice_'):
+        print('ENTERING PRACTICE BLOCK...')
+        practice_parameters = phase.split('_')[1]
+        (u, s) = practice_parameters
 
         # Define a sequence for trial handler with 1/5 chance for an oddball.
         practice_sequence = ['standard','standard','standard','standard','oddball']
         number_of_repetitions = round(number_of_practice_trials/len(practice_sequence))
+
         # Trial handler calls the sequence and displays it randomized:
         practice_trials = data.TrialHandler(practice_sequence, nReps = number_of_repetitions, method='random')
         # Add loop of block to experiment handler. Any collected data by trials will be transfered to experiment handler automaticall.
@@ -670,6 +683,12 @@ for phase in phase_handler:
         # Onset of practice_trials:
         send_trigger('practice_trials')
         print('START OF PRACTICE TRIAL BLOCK')
+
+        if u == '+':
+            print('SHOW UTILITY SLIDE')
+            draw_utility_slide()
+            mywin.flip()
+            core.wait(7)
 
         for practice_trial in practice_trials:
             # Send eeg trigger:
@@ -679,30 +698,38 @@ for phase in phase_handler:
             # Time since start of experiment, is also recorded by eyetracker:
             timestamp_exp = core.getTime()
             timestamp_tracker = tracker.trackerTime()
-            print('NEW TRIAL')
+            print('NEW PRACTICE TRIAL')
             print("ISI: ",ISI)
             print("gaze position: ",tracker.getPosition())
-            # Stimulus presentation:
+            # In each trial, the stimulus (standard or oddball) and the fixcross ist presented:
             send_trigger('stimulus')
             actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = practice_trial, salience = 'u')
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(ISI)
-            # Collected global data is savd to output file:
+            if practice_trial == 'oddball' and len(all_responses) != 0:
+                responses_median = statistics.median(all_responses)
+                print(responses_median)
+
+            # Save data in .csv file:
+            # Information about each phase:
             phase_handler.addData('phase', phase)
             phase_handler.addData('block_counter', block_counter)
-            practice_trials.addData('oddball_trial_counter',oddball_trial_counter) 
+            # Information about each trial in phase:
             practice_trials.addData('practice_trial', practice_trial)
-            practice_trials.addData('timestamp', timestamp) 
-            practice_trials.addData('timestamp_exp', timestamp_exp) #
-            practice_trials.addData('timestamp_tracker', timestamp_tracker) 
+            practice_trials.addData('oddball_trial_counter',oddball_trial_counter) 
             practice_trials.addData('stimulus_duration', actual_stimulus_duration)
             practice_trials.addData('ISI_expected', ISI)
             practice_trials.addData('ISI_duration', fixcross_duration)
             practice_trials.addData('gaze_offset_duration', offset_duration)
             practice_trials.addData('trial_pause_duration', pause_duration)
             practice_trials.addData('trial_nodata_duration', nodata_duration)
+            practice_trials.addData('all_responses', all_responses)
+            practice_trials.addData('timestamp', timestamp) 
+            practice_trials.addData('timestamp_exp', timestamp_exp) 
+            practice_trials.addData('timestamp_tracker', timestamp_tracker) 
+
             oddball_trial_counter += 1
-        exp.nextEntry() 
+            exp.nextEntry() 
 
 # During calibration process, pupil dilation (black slide) and
 # pupil constriction (white slide) are assessed.
