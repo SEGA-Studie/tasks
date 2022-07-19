@@ -220,7 +220,7 @@ def draw_utility_slide(background_color = background_color_rgb):
 
     utility_slide = visual.TextStim(
         win = mywin,
-        text = "Im folgenden Block kannst du\n für jede schnelle Reaktionen\n10 Cent gewinnen.",
+        text = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen.",
         color = 'black',
         units = 'pix',
         wrapWidth = 900,
@@ -509,23 +509,24 @@ def define_ISI_interval():
 # Any data that is collected  will be transfered to experiment handler automatically.
 # Oddballs are defined as strings. 1st place is u, 2nd is s:
 oddballs = ['oddball_++', 'oddball_+-', 'oddball_-+', 'oddball_--']
-practice_oddballs = oddballs
+practoddballs = ['oddball_++', 'oddball_+-', 'oddball_-+', 'oddball_--']
 
 random.shuffle(oddballs)
-random.shuffle(practice_oddballs)
+random.shuffle(practoddballs)
+print(practoddballs)
 
 phase_sequence = [
     'instruction1',
     'baseline_calibration',
     'instruction2',
     'baseline',
-    practice_oddballs[0],
+    practoddballs[0],
     'baseline',
-    practice_oddballs[1],
+    practoddballs[1],
     'baseline',
-    practice_oddballs[2],
+    practoddballs[2],
     'baseline',
-    practice_oddballs[3],
+    practoddballs[3],
     'instruction3',
     'baseline',
     oddballs[0],
@@ -546,6 +547,7 @@ block_counter = 0
 oddball_trial_counter = 1
 manipulation_trial_counter = 1
 baseline_trial_counter = 1
+practice_trial_counter = 1
 
 # Send trigger:
 send_trigger('experiment_start')
@@ -667,7 +669,7 @@ for phase in phase_handler:
         baseline_trial_counter += 1
         exp.nextEntry()
 
-    if phase.startswith('practice_'):
+    if phase.startswith('practoddball_'):
         print('ENTERING PRACTICE BLOCK...')
         practice_parameters = phase.split('_')[1]
         (u, s) = practice_parameters
@@ -702,8 +704,8 @@ for phase in phase_handler:
             print("ISI: ",ISI)
             print("gaze position: ",tracker.getPosition())
             # In each trial, the stimulus (standard or oddball) and the fixcross ist presented:
-            send_trigger('stimulus')
-            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = practice_trial, salience = 'u')
+            send_trigger('trial')
+            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = practice_trial, salience = s)
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(ISI)
             if practice_trial == 'oddball' and len(all_responses) != 0:
@@ -716,7 +718,7 @@ for phase in phase_handler:
             phase_handler.addData('block_counter', block_counter)
             # Information about each trial in phase:
             practice_trials.addData('practice_trial', practice_trial)
-            practice_trials.addData('oddball_trial_counter',oddball_trial_counter) 
+            practice_trials.addData('practice_trial_counter', practice_trial_counter) 
             practice_trials.addData('stimulus_duration', actual_stimulus_duration)
             practice_trials.addData('ISI_expected', ISI)
             practice_trials.addData('ISI_duration', fixcross_duration)
@@ -728,7 +730,7 @@ for phase in phase_handler:
             practice_trials.addData('timestamp_exp', timestamp_exp) 
             practice_trials.addData('timestamp_tracker', timestamp_tracker) 
 
-            oddball_trial_counter += 1
+            practice_trial_counter += 1
             exp.nextEntry() 
 
 # During calibration process, pupil dilation (black slide) and
