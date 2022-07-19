@@ -34,25 +34,25 @@ print(eyetracking_data_folder)
 
 # Testmode.
 # TRUE mimics an eye-tracker by mouse movement, FALSE = eye-tracking hardware is required.
-testmode = False
+testmode = True
 
 # Experimental settings:
 # Input dialgue boxes are presented on external screen 1.
 dialog_screen = 1
 # Stimuli are presented on internal screen 0.
-presentation_screen = 0 
+presentation_screen = 0
 number_of_trials = 10 #should be multiplier of 5 - target 100
 stimulus_duration_in_seconds = 0.1
 # If oddball or standrad stimulus is defined below.
-sound_one_in_Hz = 500 
-sound_two_in_Hz = 750 
+sound_one_in_Hz = 500
+sound_two_in_Hz = 750
 size_fixation_cross_in_pixels = 60
 # Inter Stimulus Interval (ISI) randomly varies between value0 and value1.
-ISI_interval = [1800, 2000] 
-# Sensitivity: Warning of gaze offset from the center.  
+ISI_interval = [1800, 2000]
+# Sensitivity: Warning of gaze offset from the center.
 gaze_offset_cutoff = 3 * size_fixation_cross_in_pixels
 # [0, 0 , 0] is gray as float [-1, 1]
-background_color_rgb = (0, 0, 0) 
+background_color_rgb = (0, 0, 0)
 white_slide = 'white'
 black_slide = 'black'
 manipulation_repetition = 1 # TARGET: 5
@@ -60,7 +60,7 @@ manipulation_repetition = 1 # TARGET: 5
 baseline_duration = 5 # TARGET: 10
 # The two parameter of manipulatin:
 squeeze_phase_duration = 6 # TARGET: 18
-relax_phase_duration = 10 # TARGET: 60 
+relax_phase_duration = 10 # TARGET: 60
 squeeze_ball_color = (50, 25, 0) # yellow
 relax_ball_color = (0, 0, 255) # blue
 baseline_calibration_repetition = 1 # TARGET: 1
@@ -76,7 +76,7 @@ pulse_duration = 0.01
 # Use standalone "Parallel Port Tester programm" to identify it.
 parallel_port_adress = 0x03FF8
 
-# Presenting a dialog box. Infos are added to settings. 
+# Presenting a dialog box. Infos are added to settings.
 settings['id'] = 123 #default testing value
 settings['group'] = ['ASD', 'TD']
 
@@ -95,7 +95,7 @@ exp = data.ExperimentHandler(
     name="auditory_oddball",
     version='0.1',
     extraInfo = settings,
-    dataFileName = str(trials_data_folder / fileName), 
+    dataFileName = str(trials_data_folder / fileName),
     )
 
 # Two different sound frequencies (conditions) are balanced across groups and
@@ -105,15 +105,15 @@ if random_number < 0.5:
     standard_sound = sound.Sound(sound_one_in_Hz)
     oddball_sound = sound.Sound(sound_two_in_Hz)
     print('oddball sound is',sound_two_in_Hz,'Hz')
-    settings['standard_frequency'] = sound_one_in_Hz 
-    settings['oddball_frequency'] = sound_two_in_Hz 
-    # exp.addData('oddball_frequency',sound_two_in_Hz) 
+    settings['standard_frequency'] = sound_one_in_Hz
+    settings['oddball_frequency'] = sound_two_in_Hz
+    # exp.addData('oddball_frequency',sound_two_in_Hz)
 if random_number >= 0.5:
     standard_sound = sound.Sound(sound_two_in_Hz)
     oddball_sound = sound.Sound(sound_one_in_Hz)
     print('oddball sound is',sound_one_in_Hz,'Hz')
-    settings['standard_frequency'] = sound_two_in_Hz 
-    settings['oddball_frequency'] = sound_one_in_Hz 
+    settings['standard_frequency'] = sound_two_in_Hz
+    settings['oddball_frequency'] = sound_one_in_Hz
     # exp.addData('oddball_frequency',sound_one_in_Hz)
 
 # Monitor parameters are adapted to presentation PC.
@@ -122,13 +122,13 @@ if random_number >= 0.5:
 mon = monitors.Monitor(
     name = 'eizo_eyetracker',
     width = 29.6,
-    distance = 65) 
+    distance = 65)
 
 # Create display window.
 # Unit was changed to pixel so that eye trcker outputs pixel on presentation screen.
 # Screen resolution is 1920/1080.
 mywin = visual.Window(
-    size = [1920,1080],           
+    size = [1920,1080],
     fullscr=True,
     monitor = mon,
     color = background_color_rgb,
@@ -181,21 +181,23 @@ tracker.setRecordingState(True)
 trigger_name_list = ['PLACEHOLDER', #0
                      'trial', #1 -
                      'standard', #2 -
-                     'oddball', #3 -
-                     'ISI', #4 -
-                     'baseline', #5 -
-                     'manipulation_squeeze', #6 -
-                     'manipulation_relax', #7 -
-                     'experiment_start', #8 -
-                     'experiment_end', #9 -
-                     'pause_initiated', #10 -
-                     'pause_ended', #11 -
-                     'experiment_aborted', #12 -
-                     'baseline_calibration', #13 -
-                     'baseline_whiteslide', #14 -
-                     'baseline_blackslide', #15 -
-                     'oddball_block', #16 -
-                     'manipulation_block'] #17 -
+                     'standard_rev', #3 -
+                     'oddball', #4 -
+                     'oddball_rev', #5 -
+                     'ISI', #6 -
+                     'baseline', #7 -
+                     'manipulation_squeeze', #8 -
+                     'manipulation_relax', #9 -
+                     'experiment_start', #10 -
+                     'experiment_end', #11 -
+                     'pause_initiated', #12 -
+                     'pause_ended', #13 -
+                     'experiment_aborted', #14 -
+                     'baseline_calibration', #15 -
+                     'baseline_whiteslide', #16 -
+                     'baseline_blackslide', #17 -
+                     'oddball_block', #18 -
+                     'manipulation_block'] #19 -
 
 print(trigger_name_list)
 
@@ -545,6 +547,10 @@ def present_stimulus(duration_in_seconds,trial):
         oddball_sound.play(when=nextFlip)
     if trial == 'standard':
         standard_sound.play(when=nextFlip)
+    if trial == 'oddball_rev':
+        standard_sound.play(when=nextFlip)
+    if trial == 'standard_rev':
+        oddball_sound.play(when=nextFlip)
     number_of_frames = round(duration_in_seconds/refresh_rate) #translate duration to number of frames
 
     #present cross for number of frames
@@ -562,6 +568,11 @@ def present_stimulus(duration_in_seconds,trial):
         oddball_sound.stop()
     if trial == 'standard':
         standard_sound.stop()
+    if trial == 'oddball_rev':
+        standard_sound.stop()
+    if trial == 'standard_rev':
+        oddball_sound.stop()
+
 
     #function output
     actual_stimulus_duration = round(clock.getTime()-timestamp,3)
@@ -603,7 +614,7 @@ def present_ball(which_phase):
 
 """EXPERIMENTAL DESIGN """
 
-phase_sequence = ['instruction1','baseline_calibration','oddball_block','baseline','oddball_block','baseline','instruction2','manipulation_block','baseline','oddball_block','baseline','oddball_block','baseline', 'instruction3']
+phase_sequence = ['instruction1','baseline_calibration','oddball_block','baseline','oddball_block_rev','baseline','instruction2','manipulation_block','baseline','oddball_block','baseline','oddball_block_rev','baseline', 'instruction3']
 phase_handler = data.TrialHandler(phase_sequence,nReps = 1, method='sequential') #trial handler calls the sequence and displays it randomized
 exp.addLoop(phase_handler) #add loop of block to experiment handler - any data that is collected  will be transfered to experiment handler automatically
 
@@ -645,18 +656,6 @@ for phase in phase_handler:
         exp.nextEntry
 
     if phase == 'oddball_block':
-        # # problem with this randomization - oddball might not occur
-        # for trial in range(number_of_trials):
-        #     random_number = random.random()
-        #     if random_number >= 0.8:
-        #         ISI = define_ISI_interval()
-        #         present_oddball(stimulus_duration_in_seconds)
-        #         fixcross(ISI)
-        #     if random_number < 0.8:
-        #         ISI = define_ISI_interval()
-        #         present_standard(stimulus_duration_in_seconds)
-        #         fixcross(ISI)
-
 
         #setup oddbal trials
         stimulus_sequence = ['standard','standard','standard','standard','oddball'] #define a sequence for trial handler - 1/5 chance for an oddball
@@ -723,6 +722,75 @@ for phase in phase_handler:
             #io.addTrialHandlerRecord(trial)
 
             exp.nextEntry() #experiment handler - move to next trial - all data is collected for this trial
+
+    if phase == 'oddball_block_rev':
+
+        #setup oddbal trials
+        stimulus_sequence = ['standard_rev','standard_rev','standard_rev','standard_rev','oddball_rev'] #define a sequence for trial handler - 1/5 chance for an oddball
+        number_of_repetitions = round(number_of_trials/len(stimulus_sequence))
+        trials = data.TrialHandler(stimulus_sequence,nReps = number_of_repetitions, method='random') #trial handler calls the sequence and displays it randomized
+        exp.addLoop(trials) #add loop of block to experiment handler - any data that is collected  by trials will be transfered to experiment handler automatically
+
+        # Inform the ioHub server about the TrialHandler - could not get this to work
+        #io.createTrialHandlerRecordTable(trials)
+
+        #onset of oddball block
+        send_trigger('oddball_block_rev')
+        print('START OF ODDBALL BLOCK REVERSAL')
+
+        for trial in trials:
+
+            #new trail - send to hdf5 file - does it do anything?
+            #io.sendMessageEvent(trial, category='test')
+            send_trigger('trial')
+
+            #create data
+            ISI = define_ISI_interval() #for each trial separately
+            timestamp = time.time() #epoch
+            timestamp_exp = getTime() #time since start of experiment - also recorded by eyetracker
+
+            timestamp_tracker = tracker.trackerTime()
+
+            #print for testing
+            print('NEW TRIAL')
+            print("ISI: ",ISI)
+            print("gaze position: ",tracker.getPosition())
+
+            #stimulus presentation
+            send_trigger(trial)
+            actual_stimulus_duration = present_stimulus(stimulus_duration_in_seconds,trial)
+
+            #ISI
+            #fixcross(ISI)
+            send_trigger('ISI')
+            [fixcross_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(ISI)
+            #print('trial was paused:' + str(trial_paused))
+
+            #collect global data --> saved to csv
+            phase_handler.addData('phase', phase)
+            phase_handler.addData('block_counter', block_counter)
+
+            #collect trial data --> saved to csv
+            trials.addData('oddball_trial_counter',oddball_trial_counter) #trial number
+            trials.addData('trial', trial) #oddball or standard
+            trials.addData('timestamp', timestamp) #seconds since 01.01.1970 (epoch)
+            trials.addData('timestamp_exp', timestamp_exp) #time since start of experiment
+            trials.addData('timestamp_tracker', timestamp_tracker) #time of eye tracker (same as epoch?)
+            trials.addData('stimulus_duration', actual_stimulus_duration)
+            trials.addData('ISI_expected', ISI)
+            trials.addData('ISI_duration', fixcross_duration)
+            trials.addData('gaze_offset_duration', offset_duration)
+            trials.addData('trial_pause_duration', pause_duration)
+            trials.addData('trial_nodata_duration', nodata_duration)
+
+            oddball_trial_counter += 1
+
+            #collect all data in trials --> also stored in hdf5 (eye tracking file)
+            #io.addTrialHandlerRecord(trial)
+            #io.addTrialHandlerRecord(trial)
+
+            exp.nextEntry() #experiment handler - move to next trial - all data is collected for this trial
+
 
     if phase == 'manipulation_block':
 
