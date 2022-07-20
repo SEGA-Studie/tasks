@@ -32,7 +32,7 @@ print(eyetracking_data_folder)
 
 # Testmode.
 # TRUE mimicks an eye-Ttracker by mouse movement, FALSE = eye-tracking hardware is required.
-testmode = True
+testmode = False
 
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
@@ -156,7 +156,9 @@ trigger_name_list = ['PLACEHOLDER', #0
                      'baseline_whiteslide', #12 -
                      'baseline_blackslide', #13 -
                      'oddball_block', #14 -
-                     'manipulation_block'
+                     'manipulation_block', #15
+                     'practice_trial', #16
+                     'practice_trials' #17
                      ]
 
 print(trigger_name_list)
@@ -413,7 +415,7 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
                 response_variable = timestamp_response, response.name, response.rt
                 all_responses.append(timestamp_response)
                 print(response_variable)
-                print('RESPONSE: [{}] {} ({})'.format(timestamp_response, response.name, response.rt))
+                print('RESPONSE: [{}] [{}] ({})'.format(timestamp_response, response.name, response.rt))
 
         # Check for keypress
         pause_duration += check_keypress()
@@ -670,7 +672,6 @@ for phase in phase_handler:
         exp.nextEntry()
 
     if phase.startswith('practoddball_'):
-        print('ENTERING PRACTICE BLOCK...')
         practice_parameters = phase.split('_')[1]
         (u, s) = practice_parameters
 
