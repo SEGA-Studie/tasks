@@ -156,9 +156,8 @@ trigger_name_list = ['PLACEHOLDER', #0
                      'baseline_whiteslide', #12 -
                      'baseline_blackslide', #13 -
                      'oddball_block', #14 -
-                     'manipulation_block', #15
-                     'practice_trial', #16
-                     'practice_trials' #17
+                     'practice_trial', #15 -
+                     'practice_trials' #16 -
                      ]
 
 print(trigger_name_list)
