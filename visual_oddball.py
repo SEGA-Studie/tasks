@@ -32,7 +32,7 @@ print(eyetracking_data_folder)
 
 # Testmode.
 # TRUE mimicks an eye-Ttracker by mouse movement, FALSE = eye-tracking hardware is required.
-testmode = False
+testmode = True
 
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
@@ -509,7 +509,7 @@ def define_ISI_interval():
 # Any data that is collected  will be transfered to experiment handler automatically.
 # Oddballs are defined as strings. 1st place is u, 2nd is s:
 oddballs = ['oddball_++', 'oddball_+-', 'oddball_-+', 'oddball_--']
-practoddballs = ['oddball_++', 'oddball_+-', 'oddball_-+', 'oddball_--']
+practoddballs = ['practoddball_++', 'practoddball_+-', 'practoddball_-+', 'practoddball_--']
 
 random.shuffle(oddballs)
 random.shuffle(practoddballs)
@@ -710,7 +710,7 @@ for phase in phase_handler:
             [fixcross_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(ISI)
             if practice_trial == 'oddball' and len(all_responses) != 0:
                 responses_median = statistics.median(all_responses)
-                print(responses_median)
+                print('MEDIAN = ' , responses_median)
 
             # Save data in .csv file:
             # Information about each phase:
