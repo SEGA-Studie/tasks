@@ -401,20 +401,22 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     gaze_offset_duration = 0
     pause_duration = 0
     nodata_duration = 0 
-    all_responses = list() # contains all space bar presses in a single trial
+    # Variables contain all space bar presses in a single trial.
+    responses_timestamp = list() # since experiment start
+    reponses_rt = list() # since trial start
     # Present cross for number of frames:
     for frameN in range(number_of_frames):
-        # Check for space bar presses during oddball blocks:
+        # Check for space bar presses during practice trials and oddball blocks:
         # In the keybord module, the space bar is coded as space(' '), 
         # other than in the event module where it is coded by the word 'space'.
+        # In the end of the practice trials the median of all reaction times is calculated for each subject individually.
         responses = kb.getKeys([' '], waitRelease = True)
-        timestamp_response = core.getTime()
+        response_timestamp = core.getTime()
         if ' ' in responses:
             for response in responses:
-                response_variable = timestamp_response, response.name, response.rt
-                all_responses.append(timestamp_response)
-                print(response_variable)
-                print('RESPONSE: [{}] [{}] ({})'.format(timestamp_response, response.name, response.rt))
+                responses_timestamp.append(response_timestamp)
+                reponses_rt.append(response.rt)
+                print('RESPONSE: [{}] [{}] ({})'.format(response_timestamp, response.name, response.rt))
 
         # Check for keypress
         pause_duration += check_keypress()
@@ -464,7 +466,7 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     print('actual fixcross duration: ' + str(actual_fixcross_duration))
     print("timing offset:",duration_in_seconds-(clock.getTime()-timestamp)) #test timing offset
 
-    return [actual_fixcross_duration, gaze_offset_duration, pause_duration, nodata_duration, all_responses]
+    return [actual_fixcross_duration, gaze_offset_duration, pause_duration, nodata_duration, responses_timestamp, reponses_rt]
 
 # Stimulus for manipulation:
 def draw_ball(size):
@@ -619,11 +621,13 @@ for phase in phase_handler:
             print('NEW TRIAL')
             print("ISI: ", ISI)
             print("gaze position: ", tracker.getPosition())
+            # Reset keyboard clock to get reaction times relative to each trial start.
+            kb.clock.reset()
             # stimulus presentation
             send_trigger('trial')
             actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = trial, salience = s)
             send_trigger('ISI')
-            [fixcross_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(ISI)
+            [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, reponses_rt] = fixcross_gazecontingent(ISI)
 
             # Save data in .csv file:
             # Information about each phase:
@@ -638,7 +642,8 @@ for phase in phase_handler:
             trials.addData('gaze_offset_duration', offset_duration)
             trials.addData('trial_pause_duration', pause_duration)
             trials.addData('trial_nodata_duration', nodata_duration)
-            trials.addData('all_responses', all_responses)
+            trials.addData('responses_timestamp', responses_timestamp)
+            trials.addData('reponses_rt', reponses_rt)
             trials.addData('timestamp', timestamp)
             trials.addData('timestamp_exp', timestamp_exp)
             trials.addData('timestamp_tracker', timestamp_tracker)
@@ -654,7 +659,7 @@ for phase in phase_handler:
         # Time since start of experiment, is also recorded by eyetracker.
         timestamp_exp = core.getTime() 
         # present baseline
-        [stimulus_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(baseline_duration)
+        [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, reponses_rt] = fixcross_gazecontingent(baseline_duration)
         # Collected global data is savd to output file:
         phase_handler.addData('phase', phase)
         phase_handler.addData('block_counter', block_counter)
@@ -703,13 +708,15 @@ for phase in phase_handler:
             print('NEW PRACTICE TRIAL')
             print("ISI: ",ISI)
             print("gaze position: ",tracker.getPosition())
+            # Reset keyboard clock to get reaction times relative to each trial start.
+            kb.clock.reset()
             # In each trial, the stimulus (standard or oddball) and the fixcross ist presented:
             send_trigger('trial')
             actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = practice_trial, salience = s)
             send_trigger('ISI')
-            [fixcross_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(ISI)
-            if practice_trial == 'oddball' and len(all_responses) != 0:
-                responses_median = statistics.median(all_responses)
+            [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, reponses_rt] = fixcross_gazecontingent(ISI)
+            if practice_trial == 'oddball' and len(reponses_rt) != 0:
+                responses_median = statistics.median(reponses_rt)
                 print('MEDIAN = ' , responses_median)
 
             # Save data in .csv file:
@@ -725,7 +732,8 @@ for phase in phase_handler:
             practice_trials.addData('gaze_offset_duration', offset_duration)
             practice_trials.addData('trial_pause_duration', pause_duration)
             practice_trials.addData('trial_nodata_duration', nodata_duration)
-            practice_trials.addData('all_responses', all_responses)
+            practice_trials.addData('responses_timestamp', responses_timestamp)
+            practice_trials.addData('reponses_rt', reponses_rt)
             practice_trials.addData('timestamp', timestamp) 
             practice_trials.addData('timestamp_exp', timestamp_exp) 
             practice_trials.addData('timestamp_tracker', timestamp_tracker) 
@@ -753,7 +761,7 @@ for phase in phase_handler:
                 timestamp_exp = core.getTime() 
                 # Present baseline
                 send_trigger('baseline')
-                [stimulus_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(baseline_duration)
+                [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, reponses_rt] = fixcross_gazecontingent(baseline_duration)
                 # Global data is saved to output file:
                 phase_handler.addData('phase', phase)
                 phase_handler.addData('block_counter', block_counter)
@@ -774,7 +782,7 @@ for phase in phase_handler:
                 timestamp_exp = core.getTime() 
                 # Present baseline with white background:
                 send_trigger('baseline_whiteslide')
-                [stimulus_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(
+                [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, reponses_rt] = fixcross_gazecontingent(
                     baseline_duration, background_color = white_slide)
                 # Global data is saved to output file:
                 phase_handler.addData('phase', phase)
@@ -795,7 +803,7 @@ for phase in phase_handler:
                 timestamp_exp = core.getTime() 
                 # Present baseline with black background:
                 send_trigger('baseline_blackslide')
-                [stimulus_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(
+                [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, reponses_rt] = fixcross_gazecontingent(
                     baseline_duration, background_color = black_slide, cross_color = 'grey')
 
                 # Global data is saved to output file:
