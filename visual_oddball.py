@@ -37,7 +37,7 @@ testmode = False
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
 number_of_repetitions = 2
-number_of_practice_trials = 20
+number_of_practice_trials = 10
 stimulus_duration_in_seconds = 0.075
 standard_ball_color = (128, 0, 128)
 size_fixation_cross_in_pixels = 60
@@ -551,6 +551,7 @@ oddball_trial_counter = 1
 manipulation_trial_counter = 1
 baseline_trial_counter = 1
 practice_trial_counter = 1
+all_responses = list()
 
 # Send trigger:
 send_trigger('experiment_start')
@@ -575,6 +576,10 @@ for phase in phase_handler:
         exp.nextEntry
 
     if phase == 'instruction3':
+        # Calculating median of reaction times in practice trials for each subject individually: 
+        responses_median = statistics.median(all_responses)
+        print('MEDIAN = ' , responses_median)
+        # Showing instruction slide:
         text_3 = "Die Übung ist beendet.\nBitte bleibe still sitzen.\n\nGleich beginnt die Aufgabe."
         print('SHOW INSTRUCTION SLIDE 3')
         draw_instruction(text = text_3)
@@ -629,6 +634,20 @@ for phase in phase_handler:
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, reponses_rt] = fixcross_gazecontingent(ISI)
 
+            # In high utility oddball blocks: Feedback for subject:
+            # if u == '+':
+            #     text_feedback_pos = "Gut gemacht!"
+            #     text_feedback_neg = "Leider keine Belohnung"
+            #     print('SHOW FEEDBACK SLIDE.')
+            #     if response_rt <= responses_median:
+            #         draw_instruction(text = text_feedback_pos)
+            #         mywin.flip()
+            #         core.wait(3)
+            #     else:
+            #         draw_instruction(text = text_feedback_pos)
+            #         mywin.flip()
+            #         core.wait(3)
+               
             # Save data in .csv file:
             # Information about each phase:
             phase_handler.addData('phase', phase)
@@ -678,7 +697,8 @@ for phase in phase_handler:
     if phase.startswith('practoddball_'):
         practice_parameters = phase.split('_')[1]
         (u, s) = practice_parameters
-
+        correct_responses = list()
+        
         # Define a sequence for trial handler with 1/5 chance for an oddball.
         practice_sequence = ['standard','standard','standard','standard','oddball']
         number_of_repetitions = round(number_of_practice_trials/len(practice_sequence))
@@ -696,7 +716,7 @@ for phase in phase_handler:
             draw_utility_slide()
             mywin.flip()
             core.wait(7)
-
+        
         for practice_trial in practice_trials:
             # Send eeg trigger:
             send_trigger('practice_trial')
@@ -716,8 +736,8 @@ for phase in phase_handler:
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, reponses_rt] = fixcross_gazecontingent(ISI)
             if practice_trial == 'oddball' and len(reponses_rt) != 0:
-                responses_median = statistics.median(reponses_rt)
-                print('MEDIAN = ' , responses_median)
+                for response_rt in reponses_rt:
+                    correct_responses.append(response_rt)
 
             # Save data in .csv file:
             # Information about each phase:
@@ -741,6 +761,10 @@ for phase in phase_handler:
             practice_trial_counter += 1
             exp.nextEntry() 
 
+        for correct_response in correct_responses:
+            all_responses.append(correct_response)
+            print('CORRECT PRACTICE RESPONSES SO FAR: ', all_responses)
+        
 # During calibration process, pupil dilation (black slide) and
 # pupil constriction (white slide) are assessed.
     if phase == 'baseline_calibration':
