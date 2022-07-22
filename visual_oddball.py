@@ -635,18 +635,19 @@ for phase in phase_handler:
             [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, reponses_rt] = fixcross_gazecontingent(ISI)
 
             # In high utility oddball blocks: Feedback for subject:
-            # if u == '+':
-            #     text_feedback_pos = "Gut gemacht!"
-            #     text_feedback_neg = "Leider keine Belohnung"
-            #     print('SHOW FEEDBACK SLIDE.')
-            #     if response_rt <= responses_median:
-            #         draw_instruction(text = text_feedback_pos)
-            #         mywin.flip()
-            #         core.wait(3)
-            #     else:
-            #         draw_instruction(text = text_feedback_pos)
-            #         mywin.flip()
-            #         core.wait(3)
+            if trial == 'oddball' and u == '+':
+                text_feedback_pos = "Gut gemacht!"
+                text_feedback_neg = "Leider keine Belohnung."
+                if reponses_rt[0] <= responses_median:
+                    print('SHOW FEEDBACK SLIDE: POSITIVE FEEDBACK')
+                    draw_instruction(text = text_feedback_pos)
+                    mywin.flip()
+                    core.wait(3)
+                if not reponses_rt or reponses_rt[0] > responses_median:
+                    print('SHOW FEEDBACK SLIDE: NEGATIVE FEEDBACK')
+                    draw_instruction(text = text_feedback_neg)
+                    mywin.flip()
+                    core.wait(3)
                
             # Save data in .csv file:
             # Information about each phase:
