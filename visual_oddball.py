@@ -555,7 +555,7 @@ for phase in phase_handler:
         exp.nextEntry
     
     if phase == 'instruction2':
-        text_2 = "Gleich startet die Übung.\nEs werden Kreise auf dem Bildschirm erscheinen.\nWeiter geht es mit der Leertaste."
+        text_2 = "Gleich startet die Übung.\nBitte drücke bei auffälligen Kreisen\nso schnell wie möglich die Leertaste.\n\nWeiter geht es mit der Leertaste."
         print('SHOW INSTRUCTIONS SLIDE 2')
         draw_instruction(text = text_2)
         mywin.flip()
@@ -623,20 +623,24 @@ for phase in phase_handler:
             [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(ISI)
 
             # In high utility oddball blocks: Feedback for subject:
+            feedback = " "
             if trial == 'oddball' and u == '+':
                 text_feedback_pos = "Gut gemacht!"
                 text_feedback_neg = "Leider keine Belohnung."
                 if not responses_rt:
+                    feedback = 'no response given'
                     print('SHOW FEEDBACK SLIDE: NEGATIVE FEEDBACK')
                     draw_instruction(text = text_feedback_neg)
                     mywin.flip()
                     core.wait(3)
                 elif responses_rt[0] <= responses_median:
+                    feedback = 'correct response'
                     print('SHOW FEEDBACK SLIDE: POSITIVE FEEDBACK')
                     draw_instruction(text = text_feedback_pos)
                     mywin.flip()
                     core.wait(3)
                 elif responses_rt[0] > responses_median:
+                    feedback = 'response too slow'
                     print('SHOW FEEDBACK SLIDE: NEGATIVE FEEDBACK')
                     draw_instruction(text = text_feedback_neg)
                     mywin.flip()
@@ -660,6 +664,8 @@ for phase in phase_handler:
             trials.addData('timestamp', timestamp)
             trials.addData('timestamp_exp', timestamp_exp)
             trials.addData('timestamp_tracker', timestamp_tracker)
+            trials.addData('feedback', feedback)
+           
             
             oddball_trial_counter += 1
             exp.nextEntry()
