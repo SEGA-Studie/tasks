@@ -555,7 +555,7 @@ for phase in phase_handler:
         exp.nextEntry
     
     if phase == 'instruction2':
-        text_2 = "Gleich startet die Übung.\nBitte drücke bei auffälligen Kreisen\nso schnell wie möglich die Leertaste.\n\nWeiter geht es mit der Leertaste."
+        text_2 = "Gleich startet die Übung.\nDrücke bei auffälligen Kreisen\nmöglichst schnell die Leertaste.\n\nWeiter geht es mit der Leertaste."
         print('SHOW INSTRUCTIONS SLIDE 2')
         draw_instruction(text = text_2)
         mywin.flip()
@@ -650,6 +650,7 @@ for phase in phase_handler:
             # Information about each phase:
             phase_handler.addData('phase', phase)
             phase_handler.addData('block_counter', block_counter)
+            phase_handler.addData('responses_median', responses_median)
             #  Information about each trial in an oddball phase:
             trials.addData('trial', trial)
             trials.addData('oddball_trial_counter', oddball_trial_counter)
@@ -704,7 +705,7 @@ for phase in phase_handler:
         number_of_repetitions = round(number_of_practice_trials/len(practice_sequence))
 
         # Trial handler calls the sequence and displays it randomized:
-        practice_trials = data.TrialHandler(practice_sequence, nReps = number_of_repetitions, method='random')
+        practice_trials = data.TrialHandler(practice_sequence, nReps = number_of_repetitions, method = 'random')
         # Add loop of block to experiment handler. Any collected data by trials will be transfered to experiment handler automaticall.
         exp.addLoop(practice_trials) 
         # Onset of practice_trials:
