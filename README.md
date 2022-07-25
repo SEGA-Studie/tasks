@@ -28,7 +28,7 @@ Install presentation PC:
       * pip install psychopy
 
 ## Monitor and Display Settings
-Monitor parameters are adapted to the presentation PC. Please note:
+Monitor parameters are adapted to the presentation PC. The name is saved with psychopy monitor manager. Please note:
 * avoid integrated graphics for experiment computers wherever possible as no accurate frame timing
 * set Windows scaling to 100% - otherwise onscreen units will not get right
 * experiment screen will be FUllHD, thus testscreen is specified accordingly

@@ -19,14 +19,13 @@ from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' 
 import statistics
 
-print("This is visual oddball")
+print("THIS IS VISUAL ODDBALL.")
 
 '''SETUP'''
 # Path to output data:
 path_to_data = Path("Desktop", "tasks", "data", "visual_oddball").resolve()
 trials_data_folder = Path(path_to_data, 'trialdata')
 eyetracking_data_folder = Path(path_to_data, 'eyetracking')
-
 print(trials_data_folder)
 print(eyetracking_data_folder)
 
@@ -37,7 +36,7 @@ testmode = False
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
 number_of_repetitions = 2
-number_of_practice_trials = 20
+number_of_practice_trials = 10
 stimulus_duration_in_seconds = 0.075
 standard_ball_color = (128, 0, 128)
 size_fixation_cross_in_pixels = 60
@@ -47,7 +46,6 @@ low_salience_ball_size = round(0.75 * size_fixation_cross_in_pixels)
 ISI_interval = [2250, 2500]
 gaze_offset_cutoff = 3 * size_fixation_cross_in_pixels
 background_color_rgb = (0, 0, 0) # grey
-#cross_color_rgb = (-127, -127, -127)
 white_slide = 'white'
 black_slide = 'black'
 baseline_duration = 5 # in seconds, duration of baseline screen, target: 10.
@@ -58,21 +56,19 @@ baseline_calibration_repetition = 1
 # Settings are stored automatically for each trial.
 settings = {}
 
-#EEG trigger variables. 10ms duration of trigger signal:
+# EEG trigger variables. 10ms duration of trigger signal:
 pulse_duration = 0.01 
-# Don't quote it! Correct port needs to be identified.
-# Use standalone "Parallel Port Tester programm" to identify it.
 parallel_port_adress = 0x03FF8
 
 # Presenting a dialog box. Infos are added to "settings".
 # id = 123 is used as default testing value.
 settings['id'] = 123
 settings['group'] = ['ASD', 'TD']
-dlg = gui.DlgFromDict(settings,title = 'visual oddball')
+dlg = gui.DlgFromDict(settings, title = 'Visual Oddball')
 if dlg.OK:
     print('EXPERIMENT IS STARTED')
 else:
-    core.quit()  # the user hit cancel so exit
+    core.quit()  # the user hit cancel to exit
 
 # Name for output data.
 fileName = str(settings['id']) + '_' + data.getDateStr(format="%Y-%m-%d-%H%M")
@@ -81,35 +77,32 @@ fileName = str(settings['id']) + '_' + data.getDateStr(format="%Y-%m-%d-%H%M")
 exp = data.ExperimentHandler(
     name = "visual_oddball",
     version = '0.1',
-    extraInfo = settings, #experiment info
-    dataFileName = str(trials_data_folder / fileName), # where to save the data
+    extraInfo = settings,
+    dataFileName = str(trials_data_folder / fileName),
     )
 str(trials_data_folder / fileName),
 
-# Monitor parameter are adapted to presentation PC.
-# Name is saved with psychopy monitor manager.
-# Distance is from screen in cm.
+# Monitor seettings: Distance is from screen in cm.
 mon = monitors.Monitor(
     name = 'eizo_eyetracker',
     width = 29.6,
     distance = 65) 
 
 # Create display window.
-# Unit was changed to pixel so that eye tracker outputs pixel on presentation screen.
+# Unit is changed to pixel so that eye tracker outputs pixel on presentation screen.
 mywin = visual.Window(
-    size=[1920,1080],
+    size = [1920,1080],
     fullscr = True,
     monitor = mon,
     color = background_color_rgb,
     screen = presentation_screen,
-    units="pix") 
+    units = "pix") 
 
 # Get monitor refresh rate in seconds:
 refresh_rate = mywin.monitorFramePeriod 
 print('monitor refresh rate: ' + str(round(refresh_rate, 3)) + ' seconds')
 
 # SETUP EYETRACKING
-# Difference to psychopy documentation required: - define name as tracker - define presentation window before.
 # Output gazeposition is alwys centered, i.e. screen center = [0,0].
 if testmode:
     print('mouse is used to mimic eyetracker...')
@@ -131,7 +124,7 @@ if not testmode:
 io = launchHubServer(**iohub_config,
                         experiment_code = str(eyetracking_data_folder),
                         session_code = fileName,
-                        datastore_name = str(eyetracking_data_folder / fileName), #where data is stored
+                        datastore_name = str(eyetracking_data_folder / fileName),
                         window = mywin)
 
 # Call the eyetracker device and start recording:
@@ -156,7 +149,8 @@ trigger_name_list = ['PLACEHOLDER', #0
                      'baseline_whiteslide', #12 -
                      'baseline_blackslide', #13 -
                      'oddball_block', #14 -
-                     'manipulation_block'
+                     'practice_trial', #15 -
+                     'practice_trials' #16 -
                      ]
 
 print(trigger_name_list)
@@ -200,7 +194,10 @@ def send_trigger(trigger_name):
 # Draw instruction slides:
 def draw_instruction(text, background_color = background_color_rgb):
     if background_color is not background_color_rgb:
-        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
+        background_rect = visual.Rect(
+            win = mywin,
+            size = mywin.size,
+            fillColor = background_color)
         background_rect.draw()
 
     instruction_slide = visual.TextStim(
@@ -212,25 +209,15 @@ def draw_instruction(text, background_color = background_color_rgb):
         height = size_fixation_cross_in_pixels)
     instruction_slide.draw()
 
-# Draw slide_utility:
-def draw_utility_slide(background_color = background_color_rgb):
-    if background_color is not background_color_rgb:
-        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
-        background_rect.draw()
-
-    utility_slide = visual.TextStim(
-        win = mywin,
-        text = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen.",
-        color = 'black',
-        units = 'pix',
-        wrapWidth = 900,
-        height = size_fixation_cross_in_pixels)
-    utility_slide.draw()
-
 # Draw fixation cross from lines:
-def draw_fixcross(background_color=background_color_rgb, cross_color = 'black'):
+def draw_fixcross(
+    background_color = background_color_rgb,
+    cross_color = 'black'):
     if background_color is not background_color_rgb:
-        background_rect = visual.Rect(win=mywin, size=mywin.size, fillColor= background_color)
+        background_rect = visual.Rect(
+            win = mywin,
+            size = mywin.size,
+            fillColor = background_color)
         background_rect.draw()
     line1 = visual.Line(win = mywin, units = 'pix', lineColor = cross_color) 
     line1.start = [-(size_fixation_cross_in_pixels/2), 0]
@@ -245,7 +232,10 @@ def draw_fixcross(background_color=background_color_rgb, cross_color = 'black'):
 def draw_gazedirect(background_color = background_color_rgb):
         # Adapt background according to privuded "background color"
     if background_color is not background_color_rgb:
-        background_rect = visual.Rect(win = mywin, size = mywin.size, fillColor = background_color)
+        background_rect = visual.Rect(
+            win = mywin,
+            size = mywin.size,
+            fillColor = background_color)
         background_rect.draw()
     # Parameters:
     function_color = 'red'
@@ -262,46 +252,46 @@ def draw_gazedirect(background_color = background_color_rgb):
         size = size_fixation_cross_in_pixels*6)
 
     # Arrow left:
-    al_line1 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    al_line1 = visual.Line(win = mywin, units = 'pix', lineColor=function_color, lineWidth=width)
     al_line1.start = [-(arrow_size_pix*arrow_pos_offset), 0]
     al_line1.end = [-(arrow_size_pix*arrow_pos_offset-arrow_size_pix), 0]
-    al_line2 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    al_line2 = visual.Line(win = mywin, units = 'pix', lineColor = function_color, lineWidth=width)
     al_line2.start = [-(arrow_size_pix*arrow_pos_offset-(arrow_size_pix/2)), -arrow_size_pix/2]
     al_line2.end = [-(arrow_size_pix*arrow_pos_offset-arrow_size_pix), 0]
-    al_line3 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    al_line3 = visual.Line(win = mywin, units = 'pix', lineColor=function_color, lineWidth=width)
     al_line3.start = [-(arrow_size_pix*arrow_pos_offset-(arrow_size_pix/2)), +arrow_size_pix/2]
     al_line3.end = [-(arrow_size_pix*arrow_pos_offset-arrow_size_pix), 0]
 
     # Arrow right:
-    ar_line1 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    ar_line1 = visual.Line(win = mywin, units = 'pix', lineColor = function_color, lineWidth = width)
     ar_line1.start = [+(arrow_size_pix*arrow_pos_offset), 0]
     ar_line1.end = [+(arrow_size_pix*arrow_pos_offset-arrow_size_pix), 0]
-    ar_line2 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    ar_line2 = visual.Line(win = mywin, units='pix', lineColor = function_color, lineWidth = width)
     ar_line2.start = [+(arrow_size_pix*arrow_pos_offset-(arrow_size_pix/2)), -arrow_size_pix/2]
     ar_line2.end = [+(arrow_size_pix*arrow_pos_offset-arrow_size_pix), 0]
-    ar_line3 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    ar_line3 = visual.Line(win = mywin, units = 'pix', lineColor = function_color, lineWidth = width)
     ar_line3.start = [+(arrow_size_pix*arrow_pos_offset-(arrow_size_pix/2)), +arrow_size_pix/2]
     ar_line3.end = [+(arrow_size_pix*arrow_pos_offset-arrow_size_pix), 0]
 
     # Arrow top:
-    at_line1 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    at_line1 = visual.Line(win = mywin, units='pix', lineColor = function_color, lineWidth = width)
     at_line1.start = [0, +(arrow_size_pix*arrow_pos_offset)]
     at_line1.end = [0, +(arrow_size_pix*arrow_pos_offset-arrow_size_pix)]
-    at_line2 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    at_line2 = visual.Line(win = mywin, units = 'pix', lineColor = function_color, lineWidth = width)
     at_line2.start = [-arrow_size_pix/2, +(arrow_size_pix*arrow_pos_offset-(arrow_size_pix/2))]
     at_line2.end = [0, +(arrow_size_pix*arrow_pos_offset-arrow_size_pix)]
-    at_line3 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    at_line3 = visual.Line(win = mywin, units = 'pix', lineColor = function_color, lineWidth = width)
     at_line3.start = [+arrow_size_pix/2, +(arrow_size_pix*arrow_pos_offset-(arrow_size_pix/2))]
     at_line3.end = [0, +(arrow_size_pix*arrow_pos_offset-arrow_size_pix)]
 
     # Arrow bottom:
-    ab_line1 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    ab_line1 = visual.Line(win = mywin, units = 'pix', lineColor = function_color, lineWidth=width)
     ab_line1.start = [0, -(arrow_size_pix*arrow_pos_offset)]
     ab_line1.end = [0, -(arrow_size_pix*arrow_pos_offset-arrow_size_pix)]
-    ab_line2 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    ab_line2 = visual.Line(win = mywin, units = 'pix', lineColor = function_color, lineWidth = width)
     ab_line2.start = [+arrow_size_pix/2, -(arrow_size_pix*arrow_pos_offset-(arrow_size_pix/2))]
     ab_line2.end = [0, -(arrow_size_pix*arrow_pos_offset-arrow_size_pix)]
-    ab_line3 = visual.Line(win=mywin, units='pix', lineColor=function_color, lineWidth=width)
+    ab_line3 = visual.Line(win = mywin, units = 'pix', lineColor = function_color, lineWidth = width)
     ab_line3.start = [-arrow_size_pix/2, -(arrow_size_pix*arrow_pos_offset-(arrow_size_pix/2))]
     ab_line3.end = [0, -(arrow_size_pix*arrow_pos_offset-arrow_size_pix)]
 
@@ -325,7 +315,7 @@ def draw_gazedirect(background_color = background_color_rgb):
     rect1.draw()
 
 # Feedback indicating that no eyes are currently detected thus eye tracking data is NA:
-def draw_nodata_info(background_color=background_color_rgb):
+def draw_nodata_info(background_color = background_color_rgb):
     # Adapt background according to privuded "background color":
     if background_color is not background_color_rgb:
         background_rect = visual.Rect(
@@ -344,12 +334,12 @@ def draw_nodata_info(background_color=background_color_rgb):
 
 # Check for keypresses, used to pause and quit experiment:
 def check_keypress():
-    keys = kb.getKeys(['p','escape'], waitRelease=True)
+    keys = kb.getKeys(['p','escape'], waitRelease = True)
     timestamp_keypress = clock.getTime()
 
     if 'escape' in keys:
         send_trigger('pause_initiated')
-        dlg = gui.Dlg(title='Quit?', labelButtonOK=' OK ', labelButtonCancel=' Cancel ')
+        dlg = gui.Dlg(title = 'Quit?', labelButtonOK = ' OK ', labelButtonCancel = ' Cancel ')
         dlg.addText('Do you really want to quit? - Then press OK')
         ok_data = dlg.show()  # show dialog and wait for OK or Cancel
         if dlg.OK:  # or if ok_data is not None
@@ -362,7 +352,7 @@ def check_keypress():
         pause_time = clock.getTime() - timestamp_keypress
     elif 'p' in keys:
         send_trigger('pause_initiated')
-        dlg = gui.Dlg(title='Pause', labelButtonOK='Continue')
+        dlg = gui.Dlg(title = 'Pause', labelButtonOK = 'Continue')
         dlg.addText('Experiment is paused - Press Continue, when ready')
         ok_data = dlg.show()  # show dialog and wait for OK
         pause_time = clock.getTime() - timestamp_keypress
@@ -392,7 +382,7 @@ def check_gaze_offset(gaze_position):
         offset_boolean = False
     return offset_boolean
 
-# Fixation cross: Check for data availability and screen center gaze:
+# Fixation cross: Check for data availability and screen center gaze.
 def fixcross_gazecontingent(duration_in_seconds, background_color = background_color_rgb, cross_color = 'black'):
     # Translate duration to number of frames:
     number_of_frames = round(duration_in_seconds/refresh_rate)
@@ -400,20 +390,20 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     gaze_offset_duration = 0
     pause_duration = 0
     nodata_duration = 0 
-    all_responses = list() # contains all space bar presses in a single trial
+    # Variables contain all space bar presses in a single trial.
+    responses_timestamp = list() # since experiment start
+    responses_rt = list() # since trial start
     # Present cross for number of frames:
     for frameN in range(number_of_frames):
-        # Check for space bar presses during oddball blocks:
-        # In the keybord module, the space bar is coded as space(' '), 
-        # other than in the event module where it is coded by the word 'space'.
+        # Check for space bar presses during practice trials and oddball blocks:
+        # In the end of the practice trials the median of all reaction times is calculated for each subject individually.
         responses = kb.getKeys([' '], waitRelease = True)
-        timestamp_response = core.getTime()
+        response_timestamp = core.getTime()
         if ' ' in responses:
             for response in responses:
-                response_variable = timestamp_response, response.name, response.rt
-                all_responses.append(timestamp_response)
-                print(response_variable)
-                print('RESPONSE: [{}] {} ({})'.format(timestamp_response, response.name, response.rt))
+                responses_timestamp.append(response_timestamp)
+                responses_rt.append(response.rt)
+                print('RESPONSE: [{}] [{}] ({})'.format(response_timestamp, response.name, response.rt))
 
         # Check for keypress
         pause_duration += check_keypress()
@@ -461,9 +451,9 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     print('gaze offset duration: ' + str(gaze_offset_duration))
     print('pause duration: ' + str(pause_duration))
     print('actual fixcross duration: ' + str(actual_fixcross_duration))
-    print("timing offset:",duration_in_seconds-(clock.getTime()-timestamp)) #test timing offset
+    print("timing offset:",duration_in_seconds-(clock.getTime()-timestamp)) # test timing offset
 
-    return [actual_fixcross_duration, gaze_offset_duration, pause_duration, nodata_duration, all_responses]
+    return [actual_fixcross_duration, gaze_offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt]
 
 # Stimulus for manipulation:
 def draw_ball(size):
@@ -509,7 +499,7 @@ def define_ISI_interval():
 # Any data that is collected  will be transfered to experiment handler automatically.
 # Oddballs are defined as strings. 1st place is u, 2nd is s:
 oddballs = ['oddball_++', 'oddball_+-', 'oddball_-+', 'oddball_--']
-practoddballs = ['oddball_++', 'oddball_+-', 'oddball_-+', 'oddball_--']
+practoddballs = ['practoddball_++', 'practoddball_+-', 'practoddball_-+', 'practoddball_--']
 
 random.shuffle(oddballs)
 random.shuffle(practoddballs)
@@ -548,6 +538,7 @@ oddball_trial_counter = 1
 manipulation_trial_counter = 1
 baseline_trial_counter = 1
 practice_trial_counter = 1
+all_responses = list()
 
 # Send trigger:
 send_trigger('experiment_start')
@@ -564,7 +555,7 @@ for phase in phase_handler:
         exp.nextEntry
     
     if phase == 'instruction2':
-        text_2 = "Gleich startet die Übung.\nEs werden Kreise auf dem Bildschirm erscheinen.\nWeiter geht es mit der Leertaste."
+        text_2 = "Gleich startet die Übung.\nDrücke bei auffälligen Kreisen\nmöglichst schnell die Leertaste.\n\nWeiter geht es mit der Leertaste."
         print('SHOW INSTRUCTIONS SLIDE 2')
         draw_instruction(text = text_2)
         mywin.flip()
@@ -572,6 +563,10 @@ for phase in phase_handler:
         exp.nextEntry
 
     if phase == 'instruction3':
+        # Calculating median of reaction times in practice trials for each subject individually: 
+        responses_median = statistics.median(all_responses)
+        print('MEDIAN = ' , responses_median)
+        # Showing instruction slide:
         text_3 = "Die Übung ist beendet.\nBitte bleibe still sitzen.\n\nGleich beginnt die Aufgabe."
         print('SHOW INSTRUCTION SLIDE 3')
         draw_instruction(text = text_3)
@@ -604,8 +599,9 @@ for phase in phase_handler:
         print('START OF ODDBALL BLOCK')
 
         if u == '+':
+            text_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
             print('SHOW UTILITY SLIDE')
-            draw_utility_slide()
+            draw_instruction(text = text_utility)
             mywin.flip()
             core.wait(7)  
 
@@ -618,16 +614,43 @@ for phase in phase_handler:
             print('NEW TRIAL')
             print("ISI: ", ISI)
             print("gaze position: ", tracker.getPosition())
+            # Reset keyboard clock to get reaction times relative to each trial start.
+            kb.clock.reset()
             # stimulus presentation
             send_trigger('trial')
             actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = trial, salience = s)
             send_trigger('ISI')
-            [fixcross_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(ISI)
+            [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(ISI)
 
+            # In high utility oddball blocks: Feedback for subject:
+            feedback = " "
+            if trial == 'oddball' and u == '+':
+                text_feedback_pos = "Gut gemacht!"
+                text_feedback_neg = "Leider keine Belohnung."
+                if not responses_rt:
+                    feedback = 'no response given'
+                    print('SHOW FEEDBACK SLIDE: NEGATIVE FEEDBACK')
+                    draw_instruction(text = text_feedback_neg)
+                    mywin.flip()
+                    core.wait(3)
+                elif responses_rt[0] <= responses_median:
+                    feedback = 'correct response'
+                    print('SHOW FEEDBACK SLIDE: POSITIVE FEEDBACK')
+                    draw_instruction(text = text_feedback_pos)
+                    mywin.flip()
+                    core.wait(3)
+                elif responses_rt[0] > responses_median:
+                    feedback = 'response too slow'
+                    print('SHOW FEEDBACK SLIDE: NEGATIVE FEEDBACK')
+                    draw_instruction(text = text_feedback_neg)
+                    mywin.flip()
+                    core.wait(3)
+               
             # Save data in .csv file:
             # Information about each phase:
             phase_handler.addData('phase', phase)
             phase_handler.addData('block_counter', block_counter)
+            phase_handler.addData('responses_median', responses_median)
             #  Information about each trial in an oddball phase:
             trials.addData('trial', trial)
             trials.addData('oddball_trial_counter', oddball_trial_counter)
@@ -637,10 +660,13 @@ for phase in phase_handler:
             trials.addData('gaze_offset_duration', offset_duration)
             trials.addData('trial_pause_duration', pause_duration)
             trials.addData('trial_nodata_duration', nodata_duration)
-            trials.addData('all_responses', all_responses)
+            trials.addData('responses_timestamp', responses_timestamp)
+            trials.addData('responses_rt', responses_rt)
             trials.addData('timestamp', timestamp)
             trials.addData('timestamp_exp', timestamp_exp)
             trials.addData('timestamp_tracker', timestamp_tracker)
+            trials.addData('feedback', feedback)
+           
             
             oddball_trial_counter += 1
             exp.nextEntry()
@@ -653,7 +679,7 @@ for phase in phase_handler:
         # Time since start of experiment, is also recorded by eyetracker.
         timestamp_exp = core.getTime() 
         # present baseline
-        [stimulus_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(baseline_duration)
+        [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(baseline_duration)
         # Collected global data is savd to output file:
         phase_handler.addData('phase', phase)
         phase_handler.addData('block_counter', block_counter)
@@ -670,16 +696,16 @@ for phase in phase_handler:
         exp.nextEntry()
 
     if phase.startswith('practoddball_'):
-        print('ENTERING PRACTICE BLOCK...')
         practice_parameters = phase.split('_')[1]
         (u, s) = practice_parameters
-
+        correct_responses = list()
+        
         # Define a sequence for trial handler with 1/5 chance for an oddball.
         practice_sequence = ['standard','standard','standard','standard','oddball']
         number_of_repetitions = round(number_of_practice_trials/len(practice_sequence))
 
         # Trial handler calls the sequence and displays it randomized:
-        practice_trials = data.TrialHandler(practice_sequence, nReps = number_of_repetitions, method='random')
+        practice_trials = data.TrialHandler(practice_sequence, nReps = number_of_repetitions, method = 'random')
         # Add loop of block to experiment handler. Any collected data by trials will be transfered to experiment handler automaticall.
         exp.addLoop(practice_trials) 
         # Onset of practice_trials:
@@ -688,10 +714,11 @@ for phase in phase_handler:
 
         if u == '+':
             print('SHOW UTILITY SLIDE')
-            draw_utility_slide()
+            text_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
+            draw_instruction(text = text_utility)
             mywin.flip()
             core.wait(7)
-
+        
         for practice_trial in practice_trials:
             # Send eeg trigger:
             send_trigger('practice_trial')
@@ -703,14 +730,16 @@ for phase in phase_handler:
             print('NEW PRACTICE TRIAL')
             print("ISI: ",ISI)
             print("gaze position: ",tracker.getPosition())
+            # Reset keyboard clock to get reaction times relative to each trial start.
+            kb.clock.reset()
             # In each trial, the stimulus (standard or oddball) and the fixcross ist presented:
             send_trigger('trial')
             actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = practice_trial, salience = s)
             send_trigger('ISI')
-            [fixcross_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(ISI)
-            if practice_trial == 'oddball' and len(all_responses) != 0:
-                responses_median = statistics.median(all_responses)
-                print(responses_median)
+            [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(ISI)
+            if practice_trial == 'oddball' and len(responses_rt) != 0:
+                for response_rt in responses_rt:
+                    correct_responses.append(response_rt)
 
             # Save data in .csv file:
             # Information about each phase:
@@ -725,7 +754,8 @@ for phase in phase_handler:
             practice_trials.addData('gaze_offset_duration', offset_duration)
             practice_trials.addData('trial_pause_duration', pause_duration)
             practice_trials.addData('trial_nodata_duration', nodata_duration)
-            practice_trials.addData('all_responses', all_responses)
+            practice_trials.addData('responses_timestamp', responses_timestamp)
+            practice_trials.addData('responses_rt', responses_rt)
             practice_trials.addData('timestamp', timestamp) 
             practice_trials.addData('timestamp_exp', timestamp_exp) 
             practice_trials.addData('timestamp_tracker', timestamp_tracker) 
@@ -733,6 +763,10 @@ for phase in phase_handler:
             practice_trial_counter += 1
             exp.nextEntry() 
 
+        for correct_response in correct_responses:
+            all_responses.append(correct_response)
+            print('CORRECT PRACTICE RESPONSES SO FAR: ', all_responses)
+        
 # During calibration process, pupil dilation (black slide) and
 # pupil constriction (white slide) are assessed.
     if phase == 'baseline_calibration':
@@ -753,7 +787,7 @@ for phase in phase_handler:
                 timestamp_exp = core.getTime() 
                 # Present baseline
                 send_trigger('baseline')
-                [stimulus_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(baseline_duration)
+                [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(baseline_duration)
                 # Global data is saved to output file:
                 phase_handler.addData('phase', phase)
                 phase_handler.addData('block_counter', block_counter)
@@ -774,7 +808,7 @@ for phase in phase_handler:
                 timestamp_exp = core.getTime() 
                 # Present baseline with white background:
                 send_trigger('baseline_whiteslide')
-                [stimulus_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(
+                [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(
                     baseline_duration, background_color = white_slide)
                 # Global data is saved to output file:
                 phase_handler.addData('phase', phase)
@@ -795,7 +829,7 @@ for phase in phase_handler:
                 timestamp_exp = core.getTime() 
                 # Present baseline with black background:
                 send_trigger('baseline_blackslide')
-                [stimulus_duration, offset_duration, pause_duration, nodata_duration, all_responses] = fixcross_gazecontingent(
+                [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(
                     baseline_duration, background_color = black_slide, cross_color = 'grey')
 
                 # Global data is saved to output file:
