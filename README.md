@@ -32,6 +32,7 @@ Monitor parameters are adapted to the presentation PC. The name is saved with ps
 * avoid integrated graphics for experiment computers wherever possible as no accurate frame timing
 * set Windows scaling to 100% - otherwise onscreen units will not get right
 * experiment screen will be FUllHD, thus testscreen is specified accordingly
+Screen resolution is 1920/1080.
 
 ## Parallel Port
 send parallel port trigger: https://psychopy.org/api/parallel.html -> send trigger -> C:\Users\stimulation\AppData\Local\Programs\PsychoPy\python.exe C:\Users\stimulation\Desktop\project_py_oddball_280322\test_parallelport.py -> see: https://stackoverflow.com/questions/26762015/psychopy-sending-triggers-on-64bit-os/26889541#26889541 -> see also: https://osdoc.cogsci.nl/3.3/manual/devices/parallel/#windows-7-32-and-64-bit.
