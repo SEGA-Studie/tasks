@@ -3,9 +3,7 @@
 
 '''LOAD MODULES'''
 # Core libraries
-from matplotlib.pyplot import draw
 from psychopy import visual, core, event, clock, data, gui, monitors, parallel
-#from psychopy.tools.filetools import fromFile, toFile
 import random, time, numpy
 # For controlling eyetracker and eye-tracking SDK
 import tobii_research
@@ -447,7 +445,7 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     print('gaze offset duration: ' + str(gaze_offset_duration))
     print('pause duration: ' + str(pause_duration))
     print('actual fixcross duration: ' + str(actual_fixcross_duration))
-    print("timing offset:",duration_in_seconds-(clock.getTime()-timestamp)) # test timing offset
+    print("timing offset:", duration_in_seconds-(clock.getTime()-timestamp))
 
     return [actual_fixcross_duration, gaze_offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt]
 
