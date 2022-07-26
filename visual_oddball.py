@@ -31,7 +31,7 @@ print(eyetracking_data_folder)
 
 # Testmode.
 # TRUE mimicks an eye-Ttracker by mouse movement, FALSE = eye-tracking hardware is required.
-testmode = False
+testmode = True
 
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
@@ -599,11 +599,18 @@ for phase in phase_handler:
         print('START OF ODDBALL BLOCK')
 
         if u == '+':
-            text_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
-            print('SHOW UTILITY SLIDE')
-            draw_instruction(text = text_utility)
+            text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
+            print('SHOW HIGH TILITY SLIDE')
+            draw_instruction(text = text_high_utility)
             mywin.flip()
-            core.wait(7)  
+            core.wait(7)
+        
+        if u == '-':
+            text_low_utility = "Jetzt kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!"
+            print('SHOW LOW UTILITY SLIDE')
+            draw_instruction(text = text_low_utility)
+            mywin.flip()
+            core.wait(7)
 
         for trial in trials:
             send_trigger('trial')
@@ -625,7 +632,7 @@ for phase in phase_handler:
             # In high utility oddball blocks: Feedback for subject:
             feedback = " "
             if trial == 'oddball' and u == '+':
-                text_feedback_pos = "Gut gemacht!"
+                text_feedback_pos = "Gut gemacht!\nDu hast 10 Cent gewonnen!"
                 text_feedback_neg = "Leider keine Belohnung."
                 if not responses_rt:
                     feedback = 'no response given'
@@ -714,8 +721,15 @@ for phase in phase_handler:
 
         if u == '+':
             print('SHOW UTILITY SLIDE')
-            text_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
-            draw_instruction(text = text_utility)
+            text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
+            draw_instruction(text = text_high_utility)
+            mywin.flip()
+            core.wait(7)
+        
+        if u == '-':
+            text_low_utility = "Jetzt kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!"
+            print('SHOW LOW UTILITY SLIDE')
+            draw_instruction(text = text_low_utility)
             mywin.flip()
             core.wait(7)
         
