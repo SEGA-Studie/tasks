@@ -3,9 +3,7 @@
 
 '''LOAD MODULES'''
 # Core libraries
-from matplotlib.pyplot import draw
 from psychopy import visual, core, event, clock, data, gui, monitors, parallel
-from psychopy.tools.filetools import fromFile, toFile
 import random, time, numpy
 # For controlling eyetracker and eye-tracking SDK
 import tobii_research
@@ -48,10 +46,10 @@ gaze_offset_cutoff = 3 * size_fixation_cross_in_pixels
 background_color_rgb = (0, 0, 0) # grey
 white_slide = 'white'
 black_slide = 'black'
-baseline_duration = 5 # in seconds, duration of baseline screen, target: 10.
+baseline_duration = 5 # TARGET: 10.
 #  After 500ms the no data detection warning should be displayed on screen.
 no_data_warning_cutoff = 0.5
-# One baseline assessment (black and white screen) at the beginning of the experiment.
+# One baseline assessment (black and white screen) at the beginning of the experiment:
 baseline_calibration_repetition = 1
 # Settings are stored automatically for each trial.
 settings = {}
@@ -70,7 +68,7 @@ if dlg.OK:
 else:
     core.quit()  # the user hit cancel to exit
 
-# Name for output data.
+# Name for output data:
 fileName = str(settings['id']) + '_' + data.getDateStr(format="%Y-%m-%d-%H%M")
 
 # Experiment handler saves experiment data automatically.
@@ -157,7 +155,6 @@ print(trigger_name_list)
 
 # Find a parallel port:
 if not testmode:
-    # Don't quote it. Correct port needs to be identified. Use standalone "Parallel Port Tester programm".
     port = parallel.ParallelPort(parallel_port_adress) 
     # Set all pins to low, otherwise no triggers will be sent.
     port.setData(0)
@@ -228,9 +225,9 @@ def draw_fixcross(
     line1.draw()
     line2.draw()
 
-# Draw figure when gaze is offset for gaze contincency:
+# Draw figure for gaze contincency, when gaze is offset:
 def draw_gazedirect(background_color = background_color_rgb):
-        # Adapt background according to privuded "background color"
+        # Adapt background according to provided "background color"
     if background_color is not background_color_rgb:
         background_rect = visual.Rect(
             win = mywin,
@@ -316,7 +313,7 @@ def draw_gazedirect(background_color = background_color_rgb):
 
 # Feedback indicating that no eyes are currently detected thus eye tracking data is NA:
 def draw_nodata_info(background_color = background_color_rgb):
-    # Adapt background according to privuded "background color":
+    # Adapt background according to provided "background color":
     if background_color is not background_color_rgb:
         background_rect = visual.Rect(
             win = mywin,
@@ -396,7 +393,6 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     # Present cross for number of frames:
     for frameN in range(number_of_frames):
         # Check for space bar presses during practice trials and oddball blocks:
-        # In the end of the practice trials the median of all reaction times is calculated for each subject individually.
         responses = kb.getKeys([' '], waitRelease = True)
         response_timestamp = core.getTime()
         if ' ' in responses:
@@ -404,7 +400,6 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
                 responses_timestamp.append(response_timestamp)
                 responses_rt.append(response.rt)
                 print('RESPONSE: [{}] [{}] ({})'.format(response_timestamp, response.name, response.rt))
-
         # Check for keypress
         pause_duration += check_keypress()
         gaze_position = tracker.getPosition()
@@ -420,7 +415,7 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
                 mywin.flip()
                 nodata_duration += refresh_rate
                 nodata_current_duration += refresh_rate
-                gaze_position = tracker.getPosition() # get new gaze data
+                gaze_position = tracker.getPosition() 
         # Check for gaze
         elif check_gaze_offset(gaze_position):
             print('warning: gaze offset')
@@ -440,18 +435,17 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
         draw_fixcross(background_color, cross_color)
         mywin.flip()
 
-    # Generate output info:
+    # Output info:
     actual_fixcross_duration = round(core.getTime()-timestamp,3)
     gaze_offset_duration = round(gaze_offset_duration,3)
     nodata_duration = round(nodata_duration,3)
 
-    # Testing:
     print('number of frames: ' + str(number_of_frames))
     print('no data duration: ' + str(nodata_duration))
     print('gaze offset duration: ' + str(gaze_offset_duration))
     print('pause duration: ' + str(pause_duration))
     print('actual fixcross duration: ' + str(actual_fixcross_duration))
-    print("timing offset:",duration_in_seconds-(clock.getTime()-timestamp)) # test timing offset
+    print("timing offset:", duration_in_seconds-(clock.getTime()-timestamp))
 
     return [actual_fixcross_duration, gaze_offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt]
 
@@ -482,7 +476,7 @@ def present_ball(duration, trial, salience):
         draw_ball(size = size)
         mywin.flip()
     print('presented ball')
-    # Calculate actual stimulus duration and return salience and utility:
+    # Calculate actual stimulus duration and return salience as well as utility:
     actual_stimulus_duration = round(clock.getTime()-timestamp,3)
     print(trial + " duration:",actual_stimulus_duration)
     return actual_stimulus_duration
@@ -532,7 +526,7 @@ phase_sequence = [
 phase_handler = data.TrialHandler(phase_sequence,nReps = 1, method = 'sequential')
 exp.addLoop(phase_handler)
 
-# Define global variables:
+# Global variables:
 block_counter = 0
 oddball_trial_counter = 1
 manipulation_trial_counter = 1
@@ -586,10 +580,8 @@ for phase in phase_handler:
         # Common oddball setup.
         oddball_parameters = phase.split('_')[1] # remove the 'oddball_' portion of the phase name
         (u, s) = oddball_parameters # u = utility; s = slience
-        
         # Sequence for trial handler with 1/5 chance for an oddball.
         stimulus_sequence = ['standard','standard','standard','standard','oddball']
-
         # Trial handler calls the sequence and displays it randomized:
         trials = data.TrialHandler(stimulus_sequence,nReps = number_of_repetitions, method = 'random')
         # Add loop of block to experiment handler. Any collected data will be transfered to experiment handler automatically.
@@ -599,24 +591,31 @@ for phase in phase_handler:
         print('START OF ODDBALL BLOCK')
 
         if u == '+':
-            text_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
-            print('SHOW UTILITY SLIDE')
-            draw_instruction(text = text_utility)
+            text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
+            print('SHOW HIGH TILITY SLIDE')
+            draw_instruction(text = text_high_utility)
             mywin.flip()
-            core.wait(7)  
+            core.wait(7)
+        
+        if u == '-':
+            text_low_utility = "Im folgenden Block kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!"
+            print('SHOW LOW UTILITY SLIDE')
+            draw_instruction(text = text_low_utility)
+            mywin.flip()
+            core.wait(7)
 
         for trial in trials:
             send_trigger('trial')
             ISI = define_ISI_interval() # jittery ISI for each trial separately
             timestamp = time.time() # epoch
-            timestamp_exp = core.getTime() # time since start of experiment - also recorded by eyetracker
+            timestamp_exp = core.getTime() # time since start of experiment
             timestamp_tracker = tracker.trackerTime()
             print('NEW TRIAL')
             print("ISI: ", ISI)
             print("gaze position: ", tracker.getPosition())
             # Reset keyboard clock to get reaction times relative to each trial start.
             kb.clock.reset()
-            # stimulus presentation
+            # Stimulus presentation:
             send_trigger('trial')
             actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = trial, salience = s)
             send_trigger('ISI')
@@ -625,7 +624,7 @@ for phase in phase_handler:
             # In high utility oddball blocks: Feedback for subject:
             feedback = " "
             if trial == 'oddball' and u == '+':
-                text_feedback_pos = "Gut gemacht!"
+                text_feedback_pos = "Gut gemacht!\nDu hast 10 Cent gewonnen!"
                 text_feedback_neg = "Leider keine Belohnung."
                 if not responses_rt:
                     feedback = 'no response given'
@@ -651,7 +650,7 @@ for phase in phase_handler:
             phase_handler.addData('phase', phase)
             phase_handler.addData('block_counter', block_counter)
             phase_handler.addData('responses_median', responses_median)
-            #  Information about each trial in an oddball phase:
+            # Information about each trial in an oddball phase:
             trials.addData('trial', trial)
             trials.addData('oddball_trial_counter', oddball_trial_counter)
             trials.addData('stimulus_duration', actual_stimulus_duration)
@@ -674,13 +673,11 @@ for phase in phase_handler:
     if phase == 'baseline':
         send_trigger('baseline')
         print('START OF BASELINE PHASE')
-        # create data
         timestamp = time.time() # epoch
-        # Time since start of experiment, is also recorded by eyetracker.
-        timestamp_exp = core.getTime() 
-        # present baseline
+        timestamp_exp = core.getTime() # time since start of experiment
+        # Present baseline:
         [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(baseline_duration)
-        # Collected global data is savd to output file:
+        # Save data about baseline phase in .csv file:
         phase_handler.addData('phase', phase)
         phase_handler.addData('block_counter', block_counter)
         phase_handler.addData('stimulus_duration', stimulus_duration)
@@ -699,14 +696,12 @@ for phase in phase_handler:
         practice_parameters = phase.split('_')[1]
         (u, s) = practice_parameters
         correct_responses = list()
-        
         # Define a sequence for trial handler with 1/5 chance for an oddball.
         practice_sequence = ['standard','standard','standard','standard','oddball']
         number_of_repetitions = round(number_of_practice_trials/len(practice_sequence))
-
         # Trial handler calls the sequence and displays it randomized:
         practice_trials = data.TrialHandler(practice_sequence, nReps = number_of_repetitions, method = 'random')
-        # Add loop of block to experiment handler. Any collected data by trials will be transfered to experiment handler automaticall.
+        # Add loop of block to experiment handler. Any collected data by trials will be transfered to experiment handler automatically.
         exp.addLoop(practice_trials) 
         # Onset of practice_trials:
         send_trigger('practice_trials')
@@ -714,18 +709,23 @@ for phase in phase_handler:
 
         if u == '+':
             print('SHOW UTILITY SLIDE')
-            text_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
-            draw_instruction(text = text_utility)
+            text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
+            draw_instruction(text = text_high_utility)
+            mywin.flip()
+            core.wait(7)
+        
+        if u == '-':
+            text_low_utility = "Im folgenden Block kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!"
+            print('SHOW LOW UTILITY SLIDE')
+            draw_instruction(text = text_low_utility)
             mywin.flip()
             core.wait(7)
         
         for practice_trial in practice_trials:
-            # Send eeg trigger:
             send_trigger('practice_trial')
             ISI = define_ISI_interval()
-            timestamp = time.time() #epoch
-            # Time since start of experiment, is also recorded by eyetracker:
-            timestamp_exp = core.getTime()
+            timestamp = time.time() # epoch
+            timestamp_exp = core.getTime() # time since start of experiment
             timestamp_tracker = tracker.trackerTime()
             print('NEW PRACTICE TRIAL')
             print("ISI: ",ISI)
@@ -762,7 +762,7 @@ for phase in phase_handler:
 
             practice_trial_counter += 1
             exp.nextEntry() 
-
+        # Saving space bar presses in a variable:
         for correct_response in correct_responses:
             all_responses.append(correct_response)
             print('CORRECT PRACTICE RESPONSES SO FAR: ', all_responses)
@@ -783,8 +783,7 @@ for phase in phase_handler:
         for baseline_trial in baseline_sequence:
             if baseline_trial == 'baseline':
                 timestamp = time.time() # Epoch
-                # Time since start of experiment, is also recorded by eyetracker.
-                timestamp_exp = core.getTime() 
+                timestamp_exp = core.getTime() # time since start of experiment
                 # Present baseline
                 send_trigger('baseline')
                 [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(baseline_duration)
@@ -804,8 +803,7 @@ for phase in phase_handler:
 
             if baseline_trial == 'baseline_whiteslide':
                 timestamp = time.time() # Epoch
-                # Time since start of experiment, is also recorded by eyetracker.
-                timestamp_exp = core.getTime() 
+                timestamp_exp = core.getTime() # time since start of experiment
                 # Present baseline with white background:
                 send_trigger('baseline_whiteslide')
                 [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(
@@ -824,9 +822,8 @@ for phase in phase_handler:
                 exp.nextEntry()
             
             if baseline_trial == 'baseline_blackslide':
-                timestamp = time.time() # Epoch
-                # Time since start of experiment, is also recorded by eyetracker.
-                timestamp_exp = core.getTime() 
+                timestamp = time.time() # epoch
+                timestamp_exp = core.getTime() # time since start of experiment
                 # Present baseline with black background:
                 send_trigger('baseline_blackslide')
                 [stimulus_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(
