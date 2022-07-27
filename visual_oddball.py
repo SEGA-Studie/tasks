@@ -545,7 +545,7 @@ for phase in phase_handler:
         draw_instruction(text = text_1)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
-        exp.nextEntry
+        #exp.nextEntry
     
     if phase == 'instruction2':
         text_2 = "Gleich startet die Übung.\nDrücke bei auffälligen Kreisen\nmöglichst schnell die Leertaste.\n\nWeiter geht es mit der Leertaste."
@@ -553,7 +553,7 @@ for phase in phase_handler:
         draw_instruction(text = text_2)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
-        exp.nextEntry
+        #exp.nextEntry
 
     if phase == 'instruction3':
         # Calculating median of reaction times in practice trials for each subject individually: 
@@ -565,7 +565,7 @@ for phase in phase_handler:
         draw_instruction(text = text_3)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
-        exp.nextEntry
+        #exp.nextEntry
     
     if phase == 'instruction4':
         text_4 = "Das Experiment ist jetzt beendet.\nBitte bleibe noch still sitzen."
@@ -573,7 +573,7 @@ for phase in phase_handler:
         draw_instruction(text = text_4)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
-        exp.nextEntry
+        #exp.nextEntry
 
     if phase.startswith('oddball_'):
         # Common oddball setup.
