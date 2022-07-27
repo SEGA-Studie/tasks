@@ -445,7 +445,6 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     print('gaze offset duration: ' + str(gaze_offset_duration))
     print('pause duration: ' + str(pause_duration))
     print('actual fixcross duration: ' + str(actual_fixcross_duration))
-    print("timing offset:", duration_in_seconds-(clock.getTime()-timestamp))
 
     return [actual_fixcross_duration, gaze_offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt]
 
@@ -591,18 +590,18 @@ for phase in phase_handler:
         print('START OF ODDBALL BLOCK')
 
         if u == '+':
-            text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
+            text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen.\n\nWeiter geht es mit der Leertaste."
             print('SHOW HIGH TILITY SLIDE')
             draw_instruction(text = text_high_utility)
             mywin.flip()
-            core.wait(7)
+            keys = event.waitKeys(keyList = ["space"])
         
         if u == '-':
-            text_low_utility = "Im folgenden Block kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!"
+            text_low_utility = "Im folgenden Block kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!\n\nWeiter geht es mit der Leertaste."
             print('SHOW LOW UTILITY SLIDE')
             draw_instruction(text = text_low_utility)
             mywin.flip()
-            core.wait(7)
+            keys = event.waitKeys(keyList = ["space"])
 
         for trial in trials:
             send_trigger('trial')
@@ -709,17 +708,19 @@ for phase in phase_handler:
 
         if u == '+':
             print('SHOW UTILITY SLIDE')
-            text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen."
+            text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen.\n\nWeiter geht es mit der Leertaste."
             draw_instruction(text = text_high_utility)
             mywin.flip()
-            core.wait(7)
+            keys = event.waitKeys(keyList = ["space"])
+            # core.wait(7)
         
         if u == '-':
-            text_low_utility = "Im folgenden Block kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!"
+            text_low_utility = "Im folgenden Block kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!\n\nWeiter geht es mit der Leertaste."
             print('SHOW LOW UTILITY SLIDE')
             draw_instruction(text = text_low_utility)
             mywin.flip()
-            core.wait(7)
+            keys = event.waitKeys(keyList = ["space"])
+            # core.wait(7)
         
         for practice_trial in practice_trials:
             send_trigger('practice_trial')
