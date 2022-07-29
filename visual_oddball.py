@@ -53,6 +53,8 @@ no_data_warning_cutoff = 0.5
 baseline_calibration_repetition = 1
 # Settings are stored automatically for each trial.
 settings = {}
+# Variabe for reward feedback in the end:    
+rewarded_responses = list()
 
 # EEG trigger variables. 10ms duration of trigger signal:
 pulse_duration = 0.01 
@@ -519,6 +521,7 @@ phase_sequence = [
     oddballs[2],
     'baseline',
     oddballs[3],
+    'reward_feedback',
     'instruction4'
     ]
 
@@ -602,7 +605,7 @@ for phase in phase_handler:
             draw_instruction(text = text_low_utility)
             mywin.flip()
             keys = event.waitKeys(keyList = ["space"])
-
+        
         for trial in trials:
             send_trigger('trial')
             ISI = define_ISI_interval() # jittery ISI for each trial separately
@@ -632,6 +635,7 @@ for phase in phase_handler:
                     mywin.flip()
                     core.wait(3)
                 elif responses_rt[0] <= responses_median:
+                    rewarded_responses.append(responses_rt)
                     feedback = 'correct response'
                     print('SHOW FEEDBACK SLIDE: POSITIVE FEEDBACK')
                     draw_instruction(text = text_feedback_pos)
@@ -712,7 +716,6 @@ for phase in phase_handler:
             draw_instruction(text = text_high_utility)
             mywin.flip()
             keys = event.waitKeys(keyList = ["space"])
-            # core.wait(7)
         
         if u == '-':
             text_low_utility = "Im folgenden Block kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!\n\nWeiter geht es mit der Leertaste."
@@ -720,7 +723,6 @@ for phase in phase_handler:
             draw_instruction(text = text_low_utility)
             mywin.flip()
             keys = event.waitKeys(keyList = ["space"])
-            # core.wait(7)
         
         for practice_trial in practice_trials:
             send_trigger('practice_trial')
@@ -842,6 +844,15 @@ for phase in phase_handler:
                 phase_handler.addData('timestamp', timestamp)
                 phase_handler.addData('timestamp_exp', timestamp_exp)
                 exp.nextEntry()
+
+    if phase == 'reward_feedback':
+        reward_money = len(rewarded_responses)*0.10
+        print("SHOW REWARD FEEDBACK SLIDE. NUMBER OF CORRECT RESPONSES: ", len(rewarded_responses), "REWARD: %.2f" % reward_money, "EURO.")
+        text_formatted = str('Du hast %.2f' % reward_money)
+        text_reward = text_formatted + ' € gewonnen!'
+        draw_instruction(text = text_reward)
+        mywin.flip()
+        core.wait(5)
 
 '''WRAP UP AND CLOSE'''
 # Send trigger that experiment has ended:
