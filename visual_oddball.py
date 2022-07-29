@@ -150,7 +150,8 @@ trigger_name_list = ['PLACEHOLDER', #0
                      'baseline_blackslide', #13 -
                      'oddball_block', #14 -
                      'practice_trial', #15 -
-                     'practice_trials' #16 -
+                     'practice_trials', #16 -
+                     'response' #17 -
                      ]
 
 print(trigger_name_list)
@@ -399,6 +400,7 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
         response_timestamp = core.getTime()
         if ' ' in responses:
             for response in responses:
+                send_trigger('response')
                 responses_timestamp.append(response_timestamp)
                 responses_rt.append(response.rt)
                 print('RESPONSE: [{}] [{}] ({})'.format(response_timestamp, response.name, response.rt))
