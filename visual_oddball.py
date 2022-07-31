@@ -136,22 +136,30 @@ tracker.setRecordingState(True)
 # i.e. list position 2 will send a trigger with value "S2".
 trigger_name_list = ['PLACEHOLDER', #0
                      'trial', #1 -
-                     'standard', #2 -
-                     'oddball', #3 -
-                     'ISI', #4-
-                     'baseline', #5 -
-                     'experiment_start', #6 -
-                     'experiment_end', #7 -
-                     'pause_initiated', #8 -
-                     'pause_ended', #9 -
-                     'experiment_aborted', #10 -
-                     'baseline_calibration', #11 -
-                     'baseline_whiteslide', #12 -
-                     'baseline_blackslide', #13 -
-                     'oddball_block', #14 -
-                     'practice_trial', #15 -
-                     'practice_trials', #16 -
-                     'response' #17 -
+                     'ISI', #2-
+                     'baseline', #3 -
+                     'experiment_start', #4 -
+                     'experiment_end', #5 -
+                     'pause_initiated', #6 -
+                     'pause_ended', #7 -
+                     'experiment_aborted', #8 -
+                     'baseline_calibration', #9 -
+                     'baseline_whiteslide', #10 -
+                     'baseline_blackslide', #11 -
+                     'oddball_block', #12 -
+                     'practice_trial', #13 -
+                     'practice_trials', #14 -
+                     'response', #15 -
+                     'standard', #16 
+                     'oddball_shigh_uhigh', #17 -
+                     'oddball_shigh_ulow', #18 -
+                     'oddball_slow_uhigh', # 19 -
+                     'oddball_slow_ulow', # 20 -
+                     'pract_standard', #21 -
+                     'practoddball_shigh_uhigh', #22 -
+                     'practoddball_shigh_ulow', # 23 -
+                     'practoddball_slow_uhigh', # 24 -
+                     'practoddball_slow_ulow' # 25 - 
                      ]
 
 print(trigger_name_list)
@@ -463,7 +471,7 @@ def draw_ball(size):
     circle1.draw()
 
 # Stimulus presentation
-def present_ball(duration, trial, salience):
+def present_ball(duration, trial, salience, utility, block):
     if trial == 'standard':
         size = standard_ball_size
     elif trial == 'oddball':
@@ -474,10 +482,36 @@ def present_ball(duration, trial, salience):
 
     number_of_frames = round(duration/refresh_rate) 
     timestamp = clock.getTime()
-    print('presenting ball: {} {} {}'.format(duration, trial, salience))
+    print('presenting ball: {} {} {} {}'.format(duration, trial, salience, utility))
+
+    if block == 'oddball_block':
+        if trial == 'standard':
+            send_trigger('standard')
+        elif trial == 'oddball' and salience == '+' and utility == '+':
+            send_trigger('oddball_shigh_uhigh')
+        elif trial == 'oddball' and salience == '+' and utility == '-':
+            send_trigger('oddball_shigh_ulow')
+        elif trial == 'oddball' and salience == '-' and utility == '+':
+            send_trigger('oddball_slow_uhigh')
+        elif trial == 'oddball' and salience == '-' and utility == '-':
+            send_trigger('oddball_slow_ulow')
+
+    if block == 'practice_block':
+        if trial == 'standard':
+            send_trigger('pract_standard')
+        elif trial == 'oddball' and salience == '+' and utility == '+':
+            send_trigger('practoddball_shigh_uhigh')
+        elif trial == 'oddball' and salience == '+' and utility == '-':
+            send_trigger('practoddball_shigh_ulow')
+        elif trial == 'oddball' and salience == '-' and utility == '+':
+            send_trigger('practoddball_slow_uhigh')
+        elif trial == 'oddball' and salience == '-' and utility == '-':
+            send_trigger('practoddball_slow_ulow')
+   
     for frameN in range(number_of_frames):
         draw_ball(size = size)
         mywin.flip()
+    
     print('presented ball')
     # Calculate actual stimulus duration and return salience as well as utility:
     actual_stimulus_duration = round(clock.getTime()-timestamp,3)
@@ -550,7 +584,6 @@ for phase in phase_handler:
         draw_instruction(text = text_1)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
-        #exp.nextEntry
     
     if phase == 'instruction2':
         text_2 = "Gleich startet die Übung.\nDrücke bei auffälligen Kreisen\nmöglichst schnell die Leertaste.\n\nWeiter geht es mit der Leertaste."
@@ -558,7 +591,6 @@ for phase in phase_handler:
         draw_instruction(text = text_2)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
-        #exp.nextEntry
 
     if phase == 'instruction3':
         # Calculating median of reaction times in practice trials for each subject individually: 
@@ -570,7 +602,6 @@ for phase in phase_handler:
         draw_instruction(text = text_3)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
-        #exp.nextEntry
     
     if phase == 'instruction4':
         text_4 = "Das Experiment ist jetzt beendet.\nBitte bleibe noch still sitzen."
@@ -578,7 +609,6 @@ for phase in phase_handler:
         draw_instruction(text = text_4)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
-        #exp.nextEntry
 
     if phase.startswith('oddball_'):
         # Common oddball setup.
@@ -587,7 +617,7 @@ for phase in phase_handler:
         # Sequence for trial handler with 1/5 chance for an oddball.
         stimulus_sequence = ['standard','standard','standard','standard','oddball']
         # Trial handler calls the sequence and displays it randomized:
-        trials = data.TrialHandler(stimulus_sequence,nReps = number_of_repetitions, method = 'random')
+        trials = data.TrialHandler(stimulus_sequence, nReps = number_of_repetitions, method = 'random')
         # Add loop of block to experiment handler. Any collected data will be transfered to experiment handler automatically.
         exp.addLoop(trials)
         # Onset of oddball block:
@@ -620,8 +650,7 @@ for phase in phase_handler:
             # Reset keyboard clock to get reaction times relative to each trial start.
             kb.clock.reset()
             # Stimulus presentation:
-            send_trigger('trial')
-            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = trial, salience = s)
+            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = trial, salience = s, utility = u, block = 'oddball_block')
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(ISI)
 
@@ -739,7 +768,7 @@ for phase in phase_handler:
             kb.clock.reset()
             # In each trial, the stimulus (standard or oddball) and the fixcross ist presented:
             send_trigger('trial')
-            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = practice_trial, salience = s)
+            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = practice_trial, salience = s, utility = u, block = 'practice_block')
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(ISI)
             if practice_trial == 'oddball' and len(responses_rt) != 0:
@@ -770,7 +799,7 @@ for phase in phase_handler:
         # Saving space bar presses in a variable:
         for correct_response in correct_responses:
             all_responses.append(correct_response)
-            print('CORRECT PRACTICE RESPONSES SO FAR: ', all_responses)
+            # print('CORRECT PRACTICE RESPONSES SO FAR: ', all_responses)
         
 # During calibration process, pupil dilation (black slide) and
 # pupil constriction (white slide) are assessed.
