@@ -779,7 +779,7 @@ for phase in phase_handler:
             phase_handler.addData('phase', phase)
             phase_handler.addData('block_counter', block_counter)
             # Information about each trial in phase:
-            practice_trials.addData('practice_trial', practice_trial)
+            practice_trials.addData('trial', practice_trial)
             practice_trials.addData('practice_trial_counter', practice_trial_counter) 
             practice_trials.addData('stimulus_duration', actual_stimulus_duration)
             practice_trials.addData('ISI_expected', ISI)
