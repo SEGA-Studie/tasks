@@ -33,7 +33,7 @@ testmode = False
 
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
-number_of_repetitions = 2
+number_of_repetitions = 2 # TARGET: 40
 number_of_practice_repetitions = 2
 stimulus_duration_in_seconds = 0.075
 standard_ball_color = (128, 0, 128)
@@ -534,6 +534,7 @@ practoddballs = ['practoddball_++', 'practoddball_+-', 'practoddball_-+', 'pract
 
 random.shuffle(oddballs)
 random.shuffle(practoddballs)
+print(oddballs)
 print(practoddballs)
 
 phase_sequence = [
