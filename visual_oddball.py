@@ -34,7 +34,7 @@ testmode = False
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
 number_of_repetitions = 2
-number_of_practice_trials = 10
+number_of_practice_repetitions = 2
 stimulus_duration_in_seconds = 0.075
 standard_ball_color = (128, 0, 128)
 size_fixation_cross_in_pixels = 60
@@ -148,7 +148,7 @@ trigger_name_list = ['PLACEHOLDER', #0
                      'baseline_blackslide', #11 -
                      'oddball_block', #12 -
                      'practice_trial', #13 -
-                     'practice_trials', #14 -
+                     'practoddball_block', #14 -
                      'response', #15 -
                      'standard', #16 
                      'oddball_shigh_uhigh', #17 -
@@ -334,7 +334,7 @@ def draw_nodata_info(background_color = background_color_rgb):
 
     no_data_warning = visual.TextStim(
         win = mywin,
-        text = 'NO EYES DETECTED!',
+        text = 'AUGEN NICHT ERKANNT!',
         color = 'red',
         units = 'pix',
         height = size_fixation_cross_in_pixels)
@@ -626,7 +626,7 @@ for phase in phase_handler:
 
         if u == '+':
             text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen.\n\nWeiter geht es mit der Leertaste."
-            print('SHOW HIGH TILITY SLIDE')
+            print('SHOW HIGH UTILITY SLIDE')
             draw_instruction(text = text_high_utility)
             mywin.flip()
             keys = event.waitKeys(keyList = ["space"])
@@ -700,7 +700,6 @@ for phase in phase_handler:
             trials.addData('timestamp_tracker', timestamp_tracker)
             trials.addData('feedback', feedback)
            
-            
             oddball_trial_counter += 1
             exp.nextEntry()
 
@@ -732,13 +731,12 @@ for phase in phase_handler:
         correct_responses = list()
         # Define a sequence for trial handler with 1/5 chance for an oddball.
         practice_sequence = ['standard','standard','standard','standard','oddball']
-        number_of_repetitions = round(number_of_practice_trials/len(practice_sequence))
         # Trial handler calls the sequence and displays it randomized:
-        practice_trials = data.TrialHandler(practice_sequence, nReps = number_of_repetitions, method = 'random')
+        practice_trials = data.TrialHandler(practice_sequence, nReps = number_of_practice_repetitions, method = 'random')
         # Add loop of block to experiment handler. Any collected data by trials will be transfered to experiment handler automatically.
         exp.addLoop(practice_trials) 
         # Onset of practice_trials:
-        send_trigger('practice_trials')
+        send_trigger('practoddball_block')
         print('START OF PRACTICE TRIAL BLOCK')
 
         if u == '+':
@@ -799,7 +797,6 @@ for phase in phase_handler:
         # Saving space bar presses in a variable:
         for correct_response in correct_responses:
             all_responses.append(correct_response)
-            # print('CORRECT PRACTICE RESPONSES SO FAR: ', all_responses)
         
 # During calibration process, pupil dilation (black slide) and
 # pupil constriction (white slide) are assessed.
@@ -836,7 +833,7 @@ for phase in phase_handler:
                 exp.nextEntry()
 
             if baseline_trial == 'baseline_whiteslide':
-                timestamp = time.time() # Epoch
+                timestamp = time.time() # epoch
                 timestamp_exp = core.getTime() # time since start of experiment
                 # Present baseline with white background:
                 send_trigger('baseline_whiteslide')
