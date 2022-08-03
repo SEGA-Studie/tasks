@@ -12,6 +12,8 @@ from psychopy.iohub import launchHubServer
 from psychopy.hardware import keyboard
 # Library for managing paths
 from pathlib import Path
+# For logging data in an seperate file:
+import logging
 # Miscellaneous: Hide messages in console from pygame:
 from os import environ 
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' 
@@ -30,6 +32,13 @@ print(eyetracking_data_folder)
 # Testmode.
 # TRUE mimicks an eye-Ttracker by mouse movement, FALSE = eye-tracking hardware is required.
 testmode = False
+
+# Setup logging:
+logging.basicConfig(
+    level = logging.DEBUG,
+    filename = 'trigger_visual_oddball.log',
+    filemode = 'w', # w = write, for each subject an separate log file.
+    format = '%(levelname)s:%(name)s:%(message)s')
 
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
@@ -195,9 +204,12 @@ def send_trigger(trigger_name):
                 port.setData(0)
             if testmode:
                 print('sent DUMMY trigger S' + str(trigger_value))
+                logging.info(' DUMMY TRIGGER WAS SENT: ' f'{trigger_value}')
+                
             trigger_name_found = True
     if not trigger_name_found:
          print('trigger name is not defined: ' + trigger_name)
+         logging.info('trigger name is not defined: ' f'{trigger_name}')
 
 # Draw instruction slides:
 def draw_instruction(text, background_color = background_color_rgb):
