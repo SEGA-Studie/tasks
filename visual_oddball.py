@@ -12,9 +12,8 @@ from psychopy.iohub import launchHubServer
 from psychopy.hardware import keyboard
 # Library for managing paths
 from pathlib import Path
-# For logging data in an seperate file:
+# For logging data in a .log file:
 import logging
-# Current date and time for .log file name.
 from datetime import datetime
 # Miscellaneous: Hide messages in console from pygame:
 from os import environ 

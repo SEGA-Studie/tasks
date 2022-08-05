@@ -18,11 +18,27 @@ from psychopy import sound
 import psychtoolbox as ptb #sound processing via ptb
 # For managing paths:
 from pathlib import Path
+# For logging data in a .log file:
+import logging
+from datetime import datetime
 # Miscellaneous: Hide messages in console from pygame:
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 '''SETUP'''
+# Setup logging:
+current_datetime = datetime.now()
+filename_visual_oddball = str(current_datetime.strftime("%Y-%m-%d %H:%M:%S")) + ' Auditory_Oddball.log'
+
+logging.basicConfig(
+    level = logging.DEBUG,
+    filename = filename_visual_oddball,
+    filemode = 'w', # w = write, for each subject an separate log file.
+    format = '%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+
+print('THIS IS AUDITORY ODDBALL.')
+logging.info(' THIS IS VISUAL ODDBALL.')
+
 # Path to output data:
 path_to_data = Path("Desktop", "tasks", "data", "auditory_oddball").resolve()
 trials_data_folder = Path(path_to_data, 'trialdata')
@@ -30,10 +46,12 @@ eyetracking_data_folder = Path(path_to_data, 'eyetracking')
 
 print(trials_data_folder)
 print(eyetracking_data_folder)
+logging.info(' ' f'{trials_data_folder}')
+logging.info(' ' f'{eyetracking_data_folder}')
 
 # Testmode.
 # TRUE mimics an eye-tracker by mouse movement, FALSE = eye-tracking hardware is required.
-testmode = False
+testmode = True
 
 # Experimental settings:
 # Input dialgue boxes are presented on external screen 1.
@@ -81,6 +99,7 @@ settings['group'] = ['ASD', 'TD']
 dlg = gui.DlgFromDict(settings,title='auditory oddball')
 if dlg.OK:
     print('EXPERIMENT IS STARTED')
+    logging.info(' EXPERIMENT IS STARTED.')
 else:
     core.quit()  # the user hit cancel so exit
 
@@ -101,13 +120,15 @@ random_number = random.random()
 if random_number < 0.5:
     standard_sound = sound.Sound(sound_one_in_Hz)
     oddball_sound = sound.Sound(sound_two_in_Hz)
-    print('oddball sound is',sound_two_in_Hz,'Hz')
+    print('oddball sound is', sound_two_in_Hz,'Hz')
+    logging.info(' ODDBALL SOUND IS : ' f'{sound_two_in_Hz}' 'Hz')
     settings['standard_frequency'] = sound_one_in_Hz
     settings['oddball_frequency'] = sound_two_in_Hz
 if random_number >= 0.5:
     standard_sound = sound.Sound(sound_two_in_Hz)
     oddball_sound = sound.Sound(sound_one_in_Hz)
-    print('oddball sound is',sound_one_in_Hz,'Hz')
+    print('oddball sound is', sound_one_in_Hz,'Hz')
+    logging.info(' ODDBALL SOUND IS : ' f'{sound_one_in_Hz}' 'Hz')
     settings['standard_frequency'] = sound_two_in_Hz 
     settings['oddball_frequency'] = sound_one_in_Hz 
 
@@ -135,16 +156,22 @@ print('monitor refresh rate: ' + str(round(refresh_rate, 3)) + ' seconds')
 # SETUP EYETRACKING:
 # Output gazeposition is alwys centered, i.e. screen center = [0,0].
 if testmode:
+    logging.info(' TESTMODE = TRUE')
     print('mouse is used to mimick eyetracker...')
     iohub_config = {'eyetracker.hw.mouse.EyeTracker': {'name': 'tracker'}}
 if not testmode:
+    logging.info('TESTMODE = FALSE')
     # Search for eye tracker:
     found_eyetrackers = tobii_research.find_all_eyetrackers()
     my_eyetracker = found_eyetrackers[0]
     print("Address: " + my_eyetracker.address)
+    logging.info(' ADDRESS: ' f'{my_eyetracker.address}')
     print("Model: " + my_eyetracker.model)
+    logging.info(' Model: ' f'{my_eyetracker.model}')
     print("Name (It's OK if this is empty): " + my_eyetracker.device_name)
+    logging.info(' Name (It is OK if this is empty): ' f'{my_eyetracker.device_name}')
     print("Serial number: " + my_eyetracker.serial_number)
+    logging.info(' Serial number: ' f'{my_eyetracker.serial_number}')
     # Define a config that allow iohub to connect to the eye-tracker:
     iohub_config = {'eyetracker.hw.tobii.EyeTracker':
         {'name': 'tracker', 'runtime_settings': {'sampling_rate': 300, }}}
@@ -235,9 +262,11 @@ def send_trigger(trigger_name):
 
             if testmode:
                 print('sent DUMMY trigger S' + str(trigger_value))
+                logging.info(' DUMMY TRIGGER WAS SENT: S' f'{trigger_value}')
             trigger_name_found = True
     if not trigger_name_found:
         print('trigger name is not defined: ' + trigger_name)
+        logging.info(' TRIGGER NAME IS NOT DEFINED: ' f'{trigger_name}')
 
 # Draw instruction slides:
 def draw_instruction(text, background_color = background_color_rgb):
@@ -445,6 +474,7 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
         # Check for eye tracking data:
         if check_nodata(gaze_position):
             print('warning: no eyes detected')
+            logging.warning(' NO EYES DETECTED')
             frameN = 1 # reset duration of for loop - resart ISI
             nodata_current_duration = 0
 
@@ -477,10 +507,15 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     nodata_duration = round(nodata_duration,3)
 
     print('numberof frames: ' + str(number_of_frames))
+    logging.info(' NUMBER OF FRAMES: ' f'{number_of_frames}')
     print('no data duration: ' + str(nodata_duration))
+    logging.info(' NO DATA DURATION: ' f'{nodata_duration}')
     print('gaze offset duration: ' + str(gaze_offset_duration))
+    logging.info(' GAZE OFFSET DURATION: ' f'{gaze_offset_duration}')
     print('pause duration: ' + str(pause_duration))
+    logging.info(' PAUSE DURATION: ' f'{pause_duration}')
     print('actual fixcross duration: ' + str(actual_fixcross_duration))
+    logging.info(' ACTUAL FIXCROSS DURAION: ' f'{actual_fixcross_duration}')
 
     return [actual_fixcross_duration, gaze_offset_duration, pause_duration, nodata_duration]
 
@@ -513,6 +548,7 @@ def present_stimulus(duration_in_seconds,trial):
     # Function output
     actual_stimulus_duration = round(clock.getTime()-timestamp,3)
     print(trial + " duration:",actual_stimulus_duration)
+    logging.info(' ' f'{trial}' ' DURATION: ' f'{actual_stimulus_duration}')
     return actual_stimulus_duration
 
 # Random interstimulus interval (SI):
@@ -539,7 +575,8 @@ def present_ball(which_phase):
             mywin.flip()
 
     actual_manipulation_duration = round(clock.getTime()-timestamp,3)
-    print(which_phase + " duration: ",actual_manipulation_duration)
+    print(which_phase + " duration: ", actual_manipulation_duration)
+    logging.info(' ' f'{which_phase}' ' DURATION: ' f'{actual_manipulation_duration}')
     return actual_manipulation_duration
 
 '''EXPERIMENTAL DESIGN'''
@@ -580,6 +617,7 @@ for phase in phase_handler:
     if phase == 'instruction1':
         text_1 = "Das Experiment beginnt jetzt.\nBitte bleibe still sitzen und\nschaue auf das Kreuz in der Mitte.\n\n Weiter mit der Leertaste."
         print('SHOW INSTRUCTIONS SLIDE 1')
+        logging.info(' SHOW INSTRUCTION SLIDE 1')
         draw_instruction(text = text_1)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
@@ -588,6 +626,7 @@ for phase in phase_handler:
     if phase == 'instruction2':
         text_2 = "Gleich wirst du einen blauen Kreis sehen.\nBitte drücke dann fest das Kraftmessgerät.\n\nMit der Leertaste geht es weiter."
         print('SHOW INSTRUCTIONS SLIDE 2')
+        logging.info(' SHOW INSTRUCTION SLIDE 2')
         draw_instruction(text = text_2)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
@@ -596,6 +635,7 @@ for phase in phase_handler:
     if phase == 'instruction3':
         text_3 = "Das Experiment ist jetzt beendet.\nBitte bleibe still noch sitzen."
         print('SHOW INSTRUCTIONS SLIDE 3')
+        logging.info(' SHOW INSTRUCTION SLIDE 3')
         draw_instruction(text = text_3)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
@@ -617,8 +657,11 @@ for phase in phase_handler:
             timestamp_tracker = tracker.trackerTime()
             # Print for testing:
             print('NEW TRIAL')
+            logging.info(' NEW TRIAL')
             print("ISI: ",ISI)
+            logging.info(' ISI: ' f'{ISI}')
             print("gaze position: ",tracker.getPosition())
+            logging.info(' GAZE POSITION: ' f'{tracker.getPosition()}')
             # Stimulus presentation:
             send_trigger(trial)
             actual_stimulus_duration = present_stimulus(stimulus_duration_in_seconds,trial)
@@ -652,6 +695,7 @@ for phase in phase_handler:
         exp.addLoop(trials) 
         send_trigger('oddball_block_rev')
         print('START OF ODDBALL BLOCK REVERSAL')
+        logging.info(' START OF ODDBALL BLOCK.')
 
         for trial in trials:
             send_trigger('trial')
@@ -660,8 +704,11 @@ for phase in phase_handler:
             timestamp_exp = core.getTime() 
             timestamp_tracker = tracker.trackerTime()
             print('NEW TRIAL')
+            logging.info(' NEW TRIAL')
             print("ISI: ",ISI)
+            logging.info(' ISI: ' f'{ISI}')
             print("gaze position: ",tracker.getPosition())
+            logging.info(' ISI: ' f'{tracker.getPosition()}')
             # Stimulus presentation:
             send_trigger(trial)
             actual_stimulus_duration = present_stimulus(stimulus_duration_in_seconds,trial)
@@ -756,6 +803,7 @@ for phase in phase_handler:
     if phase == 'baseline':
         send_trigger('baseline')
         print('START OF BASELINE PHASE')
+        logging.info(' START OF BASELINE PHASE')
         timestamp = time.time() 
         timestamp_exp = core.getTime() 
         [stimulus_duration, offset_duration, pause_duration, nodata_duration] = fixcross_gazecontingent(baseline_duration)
@@ -787,6 +835,7 @@ for phase in phase_handler:
         exp.addLoop(exp_baseline_calibration) 
         send_trigger('baseline_calibration')
         print('START OF BASELINE CALIBRATION PHASE')
+        logging.info(' START OF BASELINE CALIBRATION PHASE')
 
         for baseline_trial in baseline_sequence:
             if baseline_trial == 'baseline':
@@ -862,6 +911,7 @@ for phase in phase_handler:
 # Send trigger that experiment has ended:
 send_trigger('experiment_end')
 print('EXPERIMENT ENDED')
+logging.info(' EXPERIMENT ENDED.')
 # Close reading from eyetracker:
 tracker.setRecordingState(False)
 # Close iohub instance:
