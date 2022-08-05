@@ -14,36 +14,45 @@ from psychopy.hardware import keyboard
 from pathlib import Path
 # For logging data in an seperate file:
 import logging
+# Current date and time for .log file name.
+from datetime import datetime
 # Miscellaneous: Hide messages in console from pygame:
 from os import environ 
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' 
 import statistics
 
-print("THIS IS VISUAL ODDBALL.")
-
 '''SETUP'''
+# Setup logging:
+current_datetime = datetime.now()
+filename_visual_oddball = str(current_datetime.strftime("%Y-%m-%d %H:%M:%S")) + ' Visual_Oddball.log'
+
+logging.basicConfig(
+    level = logging.DEBUG,
+    filename = filename_visual_oddball,
+    filemode = 'w', # w = write, for each subject an separate log file.
+    format = '%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+    
+print("THIS IS VISUAL ODDBALL.")
+logging.info('THIS IS VISUAL ODDBALL.')
+
 # Path to output data:
 path_to_data = Path("Desktop", "tasks", "data", "visual_oddball").resolve()
 trials_data_folder = Path(path_to_data, 'trialdata')
 eyetracking_data_folder = Path(path_to_data, 'eyetracking')
 print(trials_data_folder)
 print(eyetracking_data_folder)
+logging.info(f'{trials_data_folder}')
+logging.info(f'{eyetracking_data_folder}')
 
 # Testmode.
 # TRUE mimicks an eye-Ttracker by mouse movement, FALSE = eye-tracking hardware is required.
-testmode = False
-
-# Setup logging:
-logging.basicConfig(
-    level = logging.DEBUG,
-    filename = 'trigger_visual_oddball.log',
-    filemode = 'w', # w = write, for each subject an separate log file.
-    format = '%(levelname)s:%(name)s:%(message)s')
+testmode = True
 
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
 number_of_repetitions = 2 # TARGET: 40
 number_of_practice_repetitions = 2
+number_of_repetitions_standards = 1
 stimulus_duration_in_seconds = 0.075
 standard_ball_color = (128, 0, 128)
 size_fixation_cross_in_pixels = 60
@@ -75,7 +84,9 @@ settings['id'] = 123
 settings['group'] = ['ASD', 'TD']
 dlg = gui.DlgFromDict(settings, title = 'Visual Oddball')
 if dlg.OK:
-    print('EXPERIMENT IS STARTED')
+    print(' EXPERIMENT IS STARTED')
+    logging.info(' EXPERIMENT IS STARTED.')
+    
 else:
     core.quit()  # the user hit cancel to exit
 
@@ -114,16 +125,22 @@ print('monitor refresh rate: ' + str(round(refresh_rate, 3)) + ' seconds')
 # SETUP EYETRACKING
 # Output gazeposition is alwys centered, i.e. screen center = [0,0].
 if testmode:
+    logging.info(' TESTMODE = TRUE.')
     print('mouse is used to mimic eyetracker...')
     iohub_config = {'eyetracker.hw.mouse.EyeTracker': {'name': 'tracker'}}
 if not testmode:
+    logging.info(' TESTMODE = FALSE')
     # Search for eye tracker:
     found_eyetrackers = tobii_research.find_all_eyetrackers()
     my_eyetracker = found_eyetrackers[0]
     print("Address: " + my_eyetracker.address)
+    logging.info(' ADDRESS: ' f'{my_eyetracker.address}')
     print("Model: " + my_eyetracker.model)
+    logging.info(' Model: ' f'{my_eyetracker.model}')
     print("Name (It's OK if this is empty): " + my_eyetracker.device_name)
+    logging.info(' Name (It is OK if this is empty): ' f'{my_eyetracker.device_name}')
     print("Serial number: " + my_eyetracker.serial_number)
+    logging.info(' Serial number: ' f'{my_eyetracker.serial_number}')
 
     # Define a config that allows iohub to connect to the eye-tracker:
     iohub_config = {'eyetracker.hw.tobii.EyeTracker':
@@ -168,7 +185,7 @@ trigger_name_list = ['PLACEHOLDER', #0
                      'practoddball_shigh_uhigh', #22 -
                      'practoddball_shigh_ulow', # 23 -
                      'practoddball_slow_uhigh', # 24 -
-                     'practoddball_slow_ulow' # 25 - 
+                     'practoddball_slow_ulow', # 25 -
                      ]
 
 print(trigger_name_list)
@@ -204,12 +221,12 @@ def send_trigger(trigger_name):
                 port.setData(0)
             if testmode:
                 print('sent DUMMY trigger S' + str(trigger_value))
-                logging.info(' DUMMY TRIGGER WAS SENT: ' f'{trigger_value}')
+                logging.info(' DUMMY TRIGGER WAS SENT: S' f'{trigger_value}')
                 
             trigger_name_found = True
     if not trigger_name_found:
          print('trigger name is not defined: ' + trigger_name)
-         logging.info('trigger name is not defined: ' f'{trigger_name}')
+         logging.info(' trigger name is not defined: ' f'{trigger_name}')
 
 # Draw instruction slides:
 def draw_instruction(text, background_color = background_color_rgb):
@@ -430,6 +447,7 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
         # Check for eyetracking data:
         if check_nodata(gaze_position):
             print('warning: no eyes detected')
+            logging.warning(' NO EYES DETECTED')
             # Reset duration for loop, restart ISI:
             frameN = 1 
             nodata_current_duration = 0
@@ -443,6 +461,7 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
         # Check for gaze
         elif check_gaze_offset(gaze_position):
             print('warning: gaze offset')
+            logging.warning(' GAZE OFFSET')
             # Reset duration of for loop - resart ISI:
             frameN = 1 
             while not check_nodata(gaze_position) and check_gaze_offset(gaze_position):
@@ -463,12 +482,16 @@ def fixcross_gazecontingent(duration_in_seconds, background_color = background_c
     actual_fixcross_duration = round(core.getTime()-timestamp,3)
     gaze_offset_duration = round(gaze_offset_duration,3)
     nodata_duration = round(nodata_duration,3)
-
     print('number of frames: ' + str(number_of_frames))
+    logging.info(' NUMBER OF FRAMES: ' f'{number_of_frames}')
     print('no data duration: ' + str(nodata_duration))
+    logging.info(' NO DATA DURATION: ' f'{nodata_duration}')
     print('gaze offset duration: ' + str(gaze_offset_duration))
+    logging.info(' GAZE OFFSET DURATION: ' f'{gaze_offset_duration}')
     print('pause duration: ' + str(pause_duration))
+    logging.info(' PAUSE DURATION: ' f'{pause_duration}')
     print('actual fixcross duration: ' + str(actual_fixcross_duration))
+    logging.info(' ACTUAL FIXCROSS DURAION: ' f'{actual_fixcross_duration}')
 
     return [actual_fixcross_duration, gaze_offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt]
 
@@ -495,8 +518,9 @@ def present_ball(duration, trial, salience, utility, block):
     number_of_frames = round(duration/refresh_rate) 
     timestamp = clock.getTime()
     print('presenting ball: {} {} {} {}'.format(duration, trial, salience, utility))
-
-    if block == 'oddball_block':
+    logging.info(' PRESENTING BALL: ' f'{duration}' ' ' f'{trial}' ' ' f'{salience}' ' ' f'{utility}')
+    
+    if block == 'oddball_block': 
         if trial == 'standard':
             send_trigger('standard')
         elif trial == 'oddball' and salience == '+' and utility == '+':
@@ -507,7 +531,6 @@ def present_ball(duration, trial, salience, utility, block):
             send_trigger('oddball_slow_uhigh')
         elif trial == 'oddball' and salience == '-' and utility == '-':
             send_trigger('oddball_slow_ulow')
-
     if block == 'practice_block':
         if trial == 'standard':
             send_trigger('pract_standard')
@@ -525,6 +548,7 @@ def present_ball(duration, trial, salience, utility, block):
         mywin.flip()
     
     print('presented ball')
+    logging.info(' PRESENTED BALL.')
     # Calculate actual stimulus duration and return salience as well as utility:
     actual_stimulus_duration = round(clock.getTime()-timestamp,3)
     print(trial + " duration:",actual_stimulus_duration)
@@ -547,7 +571,9 @@ practoddballs = ['practoddball_++', 'practoddball_+-', 'practoddball_-+', 'pract
 random.shuffle(oddballs)
 random.shuffle(practoddballs)
 print(oddballs)
+logging.info(' ODDBALL SEQUENCE: ' f'{oddballs}')
 print(practoddballs)
+logging.info(' PRACTODDBALL SEQUENCE: ' f'{practoddballs}')
 
 phase_sequence = [
     'instruction1',
@@ -594,6 +620,7 @@ for phase in phase_handler:
     if phase == 'instruction1':
         text_1 = "Das Experiment beginnt jetzt.\nBitte bleibe still sitzen und\nschaue auf das Kreuz in der Mitte.\n\n Weiter mit der Leertaste."
         print('SHOW INSTRUCTION SLIDE 1')
+        logging.info(' SHOW INSTRUCTION SLIDE 1')
         draw_instruction(text = text_1)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
@@ -601,6 +628,7 @@ for phase in phase_handler:
     if phase == 'instruction2':
         text_2 = "Gleich startet die Übung.\nDrücke bei auffälligen Kreisen\nmöglichst schnell die Leertaste.\n\nWeiter geht es mit der Leertaste."
         print('SHOW INSTRUCTIONS SLIDE 2')
+        logging.info(' SHOW INSTRUCTION SLIDE 2')
         draw_instruction(text = text_2)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
@@ -609,9 +637,11 @@ for phase in phase_handler:
         # Calculating median of reaction times in practice trials for each subject individually: 
         responses_median = statistics.median(all_responses)
         print('MEDIAN = ' , responses_median)
+        logging.info(' MEDIAN = ' f'{responses_median}')
         # Showing instruction slide:
         text_3 = "Die Übung ist beendet.\nBitte bleibe still sitzen.\n\nGleich beginnt die Aufgabe."
         print('SHOW INSTRUCTION SLIDE 3')
+        logging.info(' SHOW INSTRUCTION SLIDE 3')
         draw_instruction(text = text_3)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
@@ -619,19 +649,25 @@ for phase in phase_handler:
     if phase == 'instruction4':
         text_4 = "Das Experiment ist jetzt beendet.\nBitte bleibe noch still sitzen."
         print('SHOW INSTRUCTION SLIDE 4')
+        logging.info(' SHOW INSTRUCTION SLIDE 4')
         draw_instruction(text = text_4)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
-
+    
     if phase.startswith('oddball_'):
         # Common oddball setup.
         oddball_parameters = phase.split('_')[1] # remove the 'oddball_' portion of the phase name
         (u, s) = oddball_parameters # u = utility; s = slience
         # Sequence for trial handler with 1/5 chance for an oddball.
         stimulus_sequence = ['standard','standard','standard','standard','oddball']
+        # Define a sequence for trial handler with 3 standard stimuli.
+        standard_sequence = ['standard', 'standard', 'standard']
         # Trial handler calls the sequence and displays it randomized:
         trials = data.TrialHandler(stimulus_sequence, nReps = number_of_repetitions, method = 'random')
         # Add loop of block to experiment handler. Any collected data will be transfered to experiment handler automatically.
+        # Trials handler for the 3 standard stimuli:
+        standards = data.TrialHandler(standard_sequence, nReps = number_of_repetitions_standards, method = 'sequential')
+        # Add loop of block to experiment handler. Any collected data by trials will be transfered to experiment handler automatically.
         exp.addLoop(trials)
         # Onset of oddball block:
         send_trigger('oddball_block')
@@ -640,17 +676,58 @@ for phase in phase_handler:
         if u == '+':
             text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen.\n\nWeiter geht es mit der Leertaste."
             print('SHOW HIGH UTILITY SLIDE')
+            logging.info(' SHOW HIGH UTILITY SLIDE.')
             draw_instruction(text = text_high_utility)
             mywin.flip()
             keys = event.waitKeys(keyList = ["space"])
         
         if u == '-':
-            text_low_utility = "Im folgenden Block kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!\n\nWeiter geht es mit der Leertaste."
+            text_low_utility = "Im folgenden Block kannst du nicht gewinnen. Drücke trotzdem so schnell zu kannst!\n\nWeiter geht es mit der Leertaste."
             print('SHOW LOW UTILITY SLIDE')
+            logging.info(' SHOW LOW UTILITY SLIDE.')
             draw_instruction(text = text_low_utility)
             mywin.flip()
             keys = event.waitKeys(keyList = ["space"])
         
+        for standard in standards:
+            send_trigger('practice_trial')
+            ISI = define_ISI_interval()
+            timestamp = time.time() # epoch
+            timestamp_exp = core.getTime() # time since start of experiment
+            timestamp_tracker = tracker.trackerTime()
+            print('NEW STANDARD TRIAL')
+            logging.info(' NEW STANDRAD TRIAL')
+            print("ISI: ",ISI)
+            logging.info(' ISI: ' f'{ISI}')
+            print("gaze position: ",tracker.getPosition())
+            logging.info(' GAZE POSITION: ' f'{tracker.getPosition()}')
+            # Reset keyboard clock to get reaction times relative to each trial start.
+            kb.clock.reset()
+            # In each trial, the stimulus (standard or oddball) and the fixcross ist presented:
+            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = standard, salience = s, utility = u, block = 'oddball_block')
+            send_trigger('ISI')
+            [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(ISI)
+
+            # Save data in .csv file:
+            # Information about each phase:
+            phase_handler.addData('phase', phase)
+            phase_handler.addData('block_counter', block_counter)
+            # Information about each trial in phase:
+            practice_trials.addData('trial', standard) 
+            practice_trials.addData('stimulus_duration', actual_stimulus_duration)
+            practice_trials.addData('ISI_expected', ISI)
+            practice_trials.addData('ISI_duration', fixcross_duration)
+            practice_trials.addData('gaze_offset_duration', offset_duration)
+            practice_trials.addData('trial_pause_duration', pause_duration)
+            practice_trials.addData('trial_nodata_duration', nodata_duration)
+            practice_trials.addData('responses_timestamp', responses_timestamp)
+            practice_trials.addData('responses_rt', responses_rt)
+            practice_trials.addData('timestamp', timestamp) 
+            practice_trials.addData('timestamp_exp', timestamp_exp) 
+            practice_trials.addData('timestamp_tracker', timestamp_tracker)
+
+            exp.nextEntry()
+
         for trial in trials:
             send_trigger('trial')
             ISI = define_ISI_interval() # jittery ISI for each trial separately
@@ -658,8 +735,11 @@ for phase in phase_handler:
             timestamp_exp = core.getTime() # time since start of experiment
             timestamp_tracker = tracker.trackerTime()
             print('NEW TRIAL')
+            logging.info(' NEW TRIAL')
             print("ISI: ", ISI)
+            logging.info(' ISI: ' f'{ISI}')
             print("gaze position: ", tracker.getPosition())
+            logging.info(' GAZE POSITION: ' f'{tracker.getPosition()}')
             # Reset keyboard clock to get reaction times relative to each trial start.
             kb.clock.reset()
             # Stimulus presentation:
@@ -675,6 +755,7 @@ for phase in phase_handler:
                 if not responses_rt:
                     feedback = 'no response given'
                     print('SHOW FEEDBACK SLIDE: NEGATIVE FEEDBACK')
+                    logging.info(' SHOW FEEDBACK SLIDE: NEGATIVE FEEDBACK.')
                     draw_instruction(text = text_feedback_neg)
                     mywin.flip()
                     core.wait(3)
@@ -682,12 +763,14 @@ for phase in phase_handler:
                     rewarded_responses.append(responses_rt)
                     feedback = 'correct response'
                     print('SHOW FEEDBACK SLIDE: POSITIVE FEEDBACK')
+                    logging.info(' SHOW FEEDBACK SLIDE: POSITIVE FEEDBACK.')
                     draw_instruction(text = text_feedback_pos)
                     mywin.flip()
                     core.wait(3)
                 elif responses_rt[0] > responses_median:
                     feedback = 'response too slow'
                     print('SHOW FEEDBACK SLIDE: NEGATIVE FEEDBACK')
+                    logging.info(' SHOW FEEDBACK SLIDE: NEGATIVE FEEDBACK.')
                     draw_instruction(text = text_feedback_neg)
                     mywin.flip()
                     core.wait(3)
@@ -719,6 +802,7 @@ for phase in phase_handler:
     if phase == 'baseline':
         send_trigger('baseline')
         print('START OF BASELINE PHASE')
+        logging.info(' START OF BASELINE PHASE.')
         timestamp = time.time() # epoch
         timestamp_exp = core.getTime() # time since start of experiment
         # Present baseline:
@@ -744,8 +828,12 @@ for phase in phase_handler:
         correct_responses = list()
         # Define a sequence for trial handler with 1/5 chance for an oddball.
         practice_sequence = ['standard','standard','standard','standard','oddball']
+        # Define a sequence for trial handler with 3 standard stimuli.
+        standard_sequence = ['standard', 'standard', 'standard']
         # Trial handler calls the sequence and displays it randomized:
         practice_trials = data.TrialHandler(practice_sequence, nReps = number_of_practice_repetitions, method = 'random')
+        # Trials handler for the 3 standard stimuli:
+        standards = data.TrialHandler(standard_sequence, nReps = number_of_repetitions_standards, method = 'sequential')
         # Add loop of block to experiment handler. Any collected data by trials will be transfered to experiment handler automatically.
         exp.addLoop(practice_trials) 
         # Onset of practice_trials:
@@ -753,7 +841,8 @@ for phase in phase_handler:
         print('START OF PRACTICE TRIAL BLOCK')
 
         if u == '+':
-            print('SHOW UTILITY SLIDE')
+            print('SHOW HIGH UTILITY SLIDE')
+            logging.info(' SHOW HIGH UTILITY SLIDE.')
             text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen.\n\nWeiter geht es mit der Leertaste."
             draw_instruction(text = text_high_utility)
             mywin.flip()
@@ -762,10 +851,50 @@ for phase in phase_handler:
         if u == '-':
             text_low_utility = "Im folgenden Block kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!\n\nWeiter geht es mit der Leertaste."
             print('SHOW LOW UTILITY SLIDE')
+            logging.info(' SHOW LOW UTILITY SLIDE.')
             draw_instruction(text = text_low_utility)
             mywin.flip()
             keys = event.waitKeys(keyList = ["space"])
         
+        for standard in standards:
+            send_trigger('practice_trial')
+            ISI = define_ISI_interval()
+            timestamp = time.time() # epoch
+            timestamp_exp = core.getTime() # time since start of experiment
+            timestamp_tracker = tracker.trackerTime()
+            print('NEW STANDARD TRIAL')
+            logging.info(' NEW STANDRAD TRIAL')
+            print("ISI: ",ISI)
+            logging.info(' ISI: ' f'{ISI}')
+            print("gaze position: ",tracker.getPosition())
+            logging.info(' GAZE POSITION: ' f'{tracker.getPosition()}')
+            # Reset keyboard clock to get reaction times relative to each trial start.
+            kb.clock.reset()
+            # In each trial, the stimulus (standard or oddball) and the fixcross ist presented:
+            actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = standard, salience = s, utility = u, block = 'practice_block')
+            send_trigger('ISI')
+            [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(ISI)
+
+            # Save data in .csv file:
+            # Information about each phase:
+            phase_handler.addData('phase', phase)
+            phase_handler.addData('block_counter', block_counter)
+            # Information about each trial in phase:
+            practice_trials.addData('trial', standard) 
+            practice_trials.addData('stimulus_duration', actual_stimulus_duration)
+            practice_trials.addData('ISI_expected', ISI)
+            practice_trials.addData('ISI_duration', fixcross_duration)
+            practice_trials.addData('gaze_offset_duration', offset_duration)
+            practice_trials.addData('trial_pause_duration', pause_duration)
+            practice_trials.addData('trial_nodata_duration', nodata_duration)
+            practice_trials.addData('responses_timestamp', responses_timestamp)
+            practice_trials.addData('responses_rt', responses_rt)
+            practice_trials.addData('timestamp', timestamp) 
+            practice_trials.addData('timestamp_exp', timestamp_exp) 
+            practice_trials.addData('timestamp_tracker', timestamp_tracker)
+
+            exp.nextEntry()
+
         for practice_trial in practice_trials:
             send_trigger('practice_trial')
             ISI = define_ISI_interval()
@@ -773,12 +902,14 @@ for phase in phase_handler:
             timestamp_exp = core.getTime() # time since start of experiment
             timestamp_tracker = tracker.trackerTime()
             print('NEW PRACTICE TRIAL')
+            logging.info(' NEW PRACTICE TRIAL')
             print("ISI: ",ISI)
+            logging.info(' ISI: ' f'{ISI}')
             print("gaze position: ",tracker.getPosition())
+            logging.info(' GAZE POSITION: ' f'{tracker.getPosition()}')
             # Reset keyboard clock to get reaction times relative to each trial start.
             kb.clock.reset()
             # In each trial, the stimulus (standard or oddball) and the fixcross ist presented:
-            send_trigger('trial')
             actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = practice_trial, salience = s, utility = u, block = 'practice_block')
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(ISI)
@@ -820,7 +951,6 @@ for phase in phase_handler:
         # Baseline calibration block is added to loop.
         # Collected data will be transfered to experiment handler automatically:
         exp.addLoop(exp_baseline_calibration)
-
         send_trigger('baseline_calibration')
         print('START OF BASELINE CALIBRATION PHASE')
 
@@ -889,6 +1019,7 @@ for phase in phase_handler:
     if phase == 'reward_feedback':
         reward_money = len(rewarded_responses)*0.10
         print("SHOW REWARD FEEDBACK SLIDE. NUMBER OF CORRECT RESPONSES: ", len(rewarded_responses), "REWARD: %.2f" % reward_money, "EURO.")
+        logging.info(' NUMBER OF CORRECT RESPONSES: ' f'{len(rewarded_responses)}' 'REWARD: ' f'{reward_money}' 'EURO.')
         text_formatted = str('Du hast %.2f' % reward_money)
         text_reward = text_formatted + ' € gewonnen!'
         draw_instruction(text = text_reward)
@@ -898,7 +1029,8 @@ for phase in phase_handler:
 '''WRAP UP AND CLOSE'''
 # Send trigger that experiment has ended:
 send_trigger('experiment_end')
-print('EXPERIMENT ENDED')
+print(' EXPERIMENT ENDED')
+logging.info('EXPERIMENT ENDED.')
 # Close reading from eyetracker:
 tracker.setRecordingState(False) 
 # Close iohub instance:
