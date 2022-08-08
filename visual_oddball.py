@@ -45,7 +45,7 @@ logging.info(f'{eyetracking_data_folder}')
 
 # Testmode.
 # TRUE mimicks an eye-Ttracker by mouse movement, FALSE = eye-tracking hardware is required.
-testmode = True
+testmode = False
 
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
@@ -604,10 +604,12 @@ exp.addLoop(phase_handler)
 
 # Global variables:
 block_counter = 0
-oddball_trial_counter = 1
 manipulation_trial_counter = 1
 baseline_trial_counter = 1
-practice_trial_counter = 1
+oddball_trial_counter = 1 # trials in oddball blocks
+standard_trial_counter = 1 # trials in oddball blocks
+standard_practice_trial_counter = 1 # trials in practice blocks
+practice_trial_counter = 1 # trials in practice blocks
 all_responses = list()
 
 # Send trigger:
@@ -661,6 +663,7 @@ for phase in phase_handler:
         stimulus_sequence = ['standard','standard','standard','standard','oddball']
         # Define a sequence for trial handler with 3 standard stimuli.
         standard_sequence = ['standard', 'standard', 'standard']
+        logging.info(' STANDARD SEQUENCE: ' f'{practoddballs}')
         # Trial handler calls the sequence and displays it randomized:
         trials = data.TrialHandler(stimulus_sequence, nReps = number_of_repetitions, method = 'random')
         # Add loop of block to experiment handler. Any collected data will be transfered to experiment handler automatically.
@@ -688,6 +691,9 @@ for phase in phase_handler:
             mywin.flip()
             keys = event.waitKeys(keyList = ["space"])
         
+        # Continuing counting after last oddball_block...
+        standard_trial_counter = oddball_trial_counter
+
         for standard in standards:
             send_trigger('practice_trial')
             ISI = define_ISI_interval()
@@ -702,7 +708,7 @@ for phase in phase_handler:
             logging.info(' GAZE POSITION: ' f'{tracker.getPosition()}')
             # Reset keyboard clock to get reaction times relative to each trial start.
             kb.clock.reset()
-            # In each trial, the stimulus (standard or oddball) and the fixcross ist presented:
+            # Each trial consists of a standard stimulus and a fixcross presentation:
             actual_stimulus_duration = present_ball(duration = stimulus_duration_in_seconds, trial = standard, salience = s, utility = u, block = 'oddball_block')
             send_trigger('ISI')
             [fixcross_duration, offset_duration, pause_duration, nodata_duration, responses_timestamp, responses_rt] = fixcross_gazecontingent(ISI)
@@ -711,8 +717,10 @@ for phase in phase_handler:
             # Information about each phase:
             phase_handler.addData('phase', phase)
             phase_handler.addData('block_counter', block_counter)
+            phase_handler.addData('responses_median', responses_median)
             # Information about each trial in phase:
-            practice_trials.addData('trial', standard) 
+            practice_trials.addData('trial', standard)
+            practice_trials.addData('oddball_trial_counter', standard_trial_counter)
             practice_trials.addData('stimulus_duration', actual_stimulus_duration)
             practice_trials.addData('ISI_expected', ISI)
             practice_trials.addData('ISI_duration', fixcross_duration)
@@ -725,7 +733,11 @@ for phase in phase_handler:
             practice_trials.addData('timestamp_exp', timestamp_exp) 
             practice_trials.addData('timestamp_tracker', timestamp_tracker)
 
+            standard_trial_counter += 1
             exp.nextEntry()
+
+        # Continuing counting after 3 standard trials...
+        oddball_trial_counter = standard_trial_counter
 
         for trial in trials:
             send_trigger('trial')
@@ -794,7 +806,7 @@ for phase in phase_handler:
             trials.addData('timestamp_exp', timestamp_exp)
             trials.addData('timestamp_tracker', timestamp_tracker)
             trials.addData('feedback', feedback)
-           
+            
             oddball_trial_counter += 1
             exp.nextEntry()
 
@@ -854,7 +866,10 @@ for phase in phase_handler:
             draw_instruction(text = text_low_utility)
             mywin.flip()
             keys = event.waitKeys(keyList = ["space"])
-        
+
+        # Continuing counting after last practoddball_block...
+        standard_practice_trial_counter = practice_trial_counter
+
         for standard in standards:
             send_trigger('practice_trial')
             ISI = define_ISI_interval()
@@ -879,7 +894,8 @@ for phase in phase_handler:
             phase_handler.addData('phase', phase)
             phase_handler.addData('block_counter', block_counter)
             # Information about each trial in phase:
-            practice_trials.addData('trial', standard) 
+            practice_trials.addData('trial', standard)
+            practice_trials.addData('practice_trial_counter', standard_practice_trial_counter)
             practice_trials.addData('stimulus_duration', actual_stimulus_duration)
             practice_trials.addData('ISI_expected', ISI)
             practice_trials.addData('ISI_duration', fixcross_duration)
@@ -892,7 +908,10 @@ for phase in phase_handler:
             practice_trials.addData('timestamp_exp', timestamp_exp) 
             practice_trials.addData('timestamp_tracker', timestamp_tracker)
 
+            standard_practice_trial_counter += 1
             exp.nextEntry()
+        # Continuing counting after 3 standard trials... 
+        practice_trial_counter = standard_practice_trial_counter
 
         for practice_trial in practice_trials:
             send_trigger('practice_trial')
@@ -937,6 +956,7 @@ for phase in phase_handler:
 
             practice_trial_counter += 1
             exp.nextEntry() 
+
         # Saving space bar presses in a variable:
         for correct_response in correct_responses:
             all_responses.append(correct_response)
