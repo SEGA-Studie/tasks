@@ -27,7 +27,7 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 '''SETUP'''
 # Setup logging:
 current_datetime = datetime.now()
-filename_visual_oddball = str(current_datetime.strftime("%Y-%m-%d %H:%M:%S")) + ' Auditory_Oddball.log'
+filename_visual_oddball = str(current_datetime.strftime("%Y-%m-%d %H-%M-%S")) + ' Auditory_Oddball.log'
 
 logging.basicConfig(
     level = logging.DEBUG,
