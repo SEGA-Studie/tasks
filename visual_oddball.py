@@ -49,7 +49,7 @@ testmode = False
 
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
-number_of_repetitions = 2 # TARGET: 40
+number_of_repetitions = 40
 number_of_practice_repetitions = 2
 number_of_repetitions_standards = 1
 stimulus_duration_in_seconds = 0.075
@@ -63,7 +63,7 @@ gaze_offset_cutoff = 3 * size_fixation_cross_in_pixels
 background_color_rgb = (0, 0, 0) # grey
 white_slide = 'white'
 black_slide = 'black'
-baseline_duration = 5 # TARGET: 10.
+baseline_duration = 5 
 #  After 500ms the no data detection warning should be displayed on screen.
 no_data_warning_cutoff = 0.5
 # One baseline assessment (black and white screen) at the beginning of the experiment:

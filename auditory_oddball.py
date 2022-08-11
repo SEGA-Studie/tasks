@@ -57,7 +57,7 @@ testmode = False
 dialog_screen = 1
 # Stimuli are presented on internal screen 0.
 presentation_screen = 0
-number_of_trials = 10 #should be multiplier of 5 - target 100
+number_of_repetitions = 20 
 number_of_repetition_standards = 1
 stimulus_duration_in_seconds = 0.1
 # If oddball or standrad stimulus is defined below.
@@ -72,15 +72,15 @@ gaze_offset_cutoff = 3 * size_fixation_cross_in_pixels
 background_color_rgb = (0, 0, 0)
 white_slide = 'white'
 black_slide = 'black'
-manipulation_repetition = 1 # TARGET: 5
+manipulation_repetition = 5 
 # Presentation duration of baseline screen, in seconds.
-baseline_duration = 5 # TARGET: 10
+baseline_duration = 5
 # The two parameter of manipulation:
-squeeze_phase_duration = 6 # TARGET: 18
-relax_phase_duration = 10 # TARGET: 60 
+squeeze_phase_duration = 18 
+relax_phase_duration = 60 
 squeeze_ball_color = (0, 0, 255) # blue
 relax_ball_color = (50, 25, 0) # yellow
-baseline_calibration_repetition = 1 # TARGET: 1
+baseline_calibration_repetition = 1 
 # After 500 ms the no_data detection warning should be displayed on the screen.
 no_data_warning_cutoff = 0.5
 # Settings are stored automatically for each trial.
@@ -678,7 +678,6 @@ for phase in phase_handler:
         stimulus_sequence = ['standard','standard','standard','standard','oddball'] 
         # Define a sequence for trial handler with 3 standard stimuli.
         standard_sequence = ['standard', 'standard', 'standard']
-        number_of_repetitions = round(number_of_trials/len(stimulus_sequence))
         # Trial handler calls the stimulus_sequence and displays it randomized.
         trials = data.TrialHandler(stimulus_sequence, nReps = number_of_repetitions, method = 'random')
         # Trial handler for 3 standard stimuli.
@@ -774,7 +773,7 @@ for phase in phase_handler:
         stimulus_sequence = ['standard_rev','standard_rev','standard_rev','standard_rev','oddball_rev']
         # Define a sequence for trial handler with 3 standard stimuli.
         standard_sequence = ['standard_rev', 'standard_rev', 'standard_rev']
-        number_of_repetitions = round(number_of_trials/len(stimulus_sequence))
+        #number_of_repetitions = round(number_of_trials/len(stimulus_sequence))
         # Trial handler calls the stimulus_sequence and displays it randomized.
         trials = data.TrialHandler(stimulus_sequence,nReps = number_of_repetitions, method = 'random')
         # Trial handler for 3 standard stimuli.
@@ -867,7 +866,6 @@ for phase in phase_handler:
     if phase == 'manipulation_block':
         # Setup experimental manipulation:
         manipulation_sequence = ['baseline','squeeze','baseline','relax']
-        manipulation_repetition = manipulation_repetition
         exp_manipulations = data.TrialHandler(manipulation_sequence, nReps = manipulation_repetition, method = 'sequential')
         # Add loop of block to trial handler.
         # Any collected data by trials will be transfered to experiment handler automatically.
