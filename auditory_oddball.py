@@ -20,6 +20,7 @@ from pathlib import Path
 # For logging data in a .log file:
 import logging
 from datetime import datetime
+import os # 
 # Miscellaneous: Hide messages in console from pygame:
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
@@ -27,11 +28,13 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 '''SETUP'''
 # Setup logging:
 current_datetime = datetime.now()
-filename_visual_oddball = str(current_datetime.strftime("%Y-%m-%d %H-%M-%S")) + ' Auditory_Oddball.log'
+formatted_datetime = str(current_datetime.strftime("%Y-%m-%d %H-%M-%S"))
+logging_path = Path("Desktop", "tasks", "data", "auditory_oddball", "logging_data").resolve()
+filename_auditory_oddball = os.path.join(logging_path, formatted_datetime)
 
 logging.basicConfig(
     level = logging.DEBUG,
-    filename = filename_visual_oddball,
+    filename = filename_auditory_oddball,
     filemode = 'w', # w = write, for each subject an separate log file.
     format = '%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
