@@ -403,7 +403,7 @@ def draw_nodata_info(background_color=background_color_rgb):
         background_rect.draw()
     no_data_warning = visual.TextStim(
         win = mywin,
-        text = 'NO EYES DETECTED!',
+        text = 'AUGEN NICHT ERKANNT!',
         color = 'red',
         units = 'pix',
         height = size_fixation_cross_in_pixels)
