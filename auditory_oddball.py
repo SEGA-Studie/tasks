@@ -659,7 +659,7 @@ for phase in phase_handler:
         exp.nextEntry()
 
     if phase == 'instruction2':
-        text_2 = "Gleich wirst du einen blauen Kreis sehen.\nBitte drücke dann fest das Kraftmessgerät.\n\nMit der Leertaste geht es weiter."
+        text_2 = "Beim blauen Kreis drücke bitte das\nKraftmessgerät so fest du kannst.\nWährend des gelben Kreises\nkannst deine Hand entspanen.\n\nMit der Leertaste geht es weiter."
         print('SHOW INSTRUCTIONS SLIDE 2')
         logging.info(' SHOW INSTRUCTION SLIDE 2')
         draw_instruction(text = text_2)

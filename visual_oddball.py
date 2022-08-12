@@ -581,6 +581,7 @@ phase_sequence = [
     'instruction1',
     'baseline_calibration',
     'instruction2',
+    "instruction_practice",
     'baseline',
     practoddballs[0],
     'baseline',
@@ -630,10 +631,17 @@ for phase in phase_handler:
         keys = event.waitKeys(keyList = ["space"])
     
     if phase == 'instruction2':
-        text_2 = "Gleich startet die Übung.\nDrücke bei auffälligen Kreisen\nmöglichst schnell die Leertaste.\n\nWeiter geht es mit der Leertaste."
+        text_2 = "Es werden nacheinander Kreise\nauf dem Bildschirm erscheinen.\nSobald du einen auffälligen Kreis\nentdeckst, drücke bitte möglichst\nschnell die Leertaste. In \nmanchen Blöcken kannst du für\nschnelle Reaktionen einen\nkleinen Geldbetrag gewinnen.\n\nWeiter mit der Leertaste."
         print('SHOW INSTRUCTIONS SLIDE 2')
         logging.info(' SHOW INSTRUCTION SLIDE 2')
         draw_instruction(text = text_2)
+        mywin.flip()
+        keys = event.waitKeys(keyList = ["space"])
+
+    if phase == "instruction_practice":
+        text_practice = "Wir starten mit einer kurzen\nÜbung, in der du dich mit \nder Aufgabe vertraut machen\nkannst. Dabei kannst du noch\nkein Geld gewinnen.\nWeiter mit der Leertaste."
+        print('SHOW INSTRUCTION_PRACTICE')
+        draw_instruction(text = text_practice)
         mywin.flip()
         keys = event.waitKeys(keyList = ["space"])
 
@@ -643,7 +651,7 @@ for phase in phase_handler:
         print('MEDIAN = ' , responses_median)
         logging.info(' MEDIAN = ' f'{responses_median}')
         # Showing instruction slide:
-        text_3 = "Die Übung ist beendet.\nBitte bleibe still sitzen.\n\nGleich beginnt die Aufgabe."
+        text_3 = "Die Übung ist beendet.\nBitte bleibe still sitzen.\nHast du Fragen zur Aufgabe?\n\nNein? Dann kannst sie jetzt\nmit der Leertaste starten."
         print('SHOW INSTRUCTION SLIDE 3')
         logging.info(' SHOW INSTRUCTION SLIDE 3')
         draw_instruction(text = text_3)
@@ -679,7 +687,7 @@ for phase in phase_handler:
         print('START OF ODDBALL BLOCK')
 
         if u == '+':
-            text_high_utility = "Im folgenden Block kannst du\n für jede schnelle Reaktion\n10 Cent gewinnen.\n\nWeiter geht es mit der Leertaste."
+            text_high_utility = "Im folgenden Block kannst du für\njede schnelle Reaktion 10 Cent gewinnen.\n\nWeiter geht es mit der Leertaste."
             print('SHOW HIGH UTILITY SLIDE')
             logging.info(' SHOW HIGH UTILITY SLIDE.')
             draw_instruction(text = text_high_utility)
@@ -687,7 +695,7 @@ for phase in phase_handler:
             keys = event.waitKeys(keyList = ["space"])
         
         if u == '-':
-            text_low_utility = "Im folgenden Block kannst du nicht gewinnen. Drücke trotzdem so schnell zu kannst!\n\nWeiter geht es mit der Leertaste."
+            text_low_utility = "Im folgenden Block kannst du\nnicht gewinnen. Drücke trotzdem so schnell zu kannst!\n\nWeiter geht es mit der Leertaste."
             print('SHOW LOW UTILITY SLIDE')
             logging.info(' SHOW LOW UTILITY SLIDE.')
             draw_instruction(text = text_low_utility)
@@ -863,7 +871,7 @@ for phase in phase_handler:
             keys = event.waitKeys(keyList = ["space"])
         
         if u == '-':
-            text_low_utility = "Im folgenden Block kannst du nicht gewinnen.\n Drücke trotzdem so schnell zu kannst!\n\nWeiter geht es mit der Leertaste."
+            text_low_utility = "Im folgenden Block kannst du\nnicht gewinnen. Drücke\ntrotzdem so schnell zu kannst!\n\nWeiter geht es mit der Leertaste."
             print('SHOW LOW UTILITY SLIDE')
             logging.info(' SHOW LOW UTILITY SLIDE.')
             draw_instruction(text = text_low_utility)
