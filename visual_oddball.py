@@ -15,6 +15,7 @@ from pathlib import Path
 # For logging data in a .log file:
 import logging
 from datetime import datetime
+import os
 # Miscellaneous: Hide messages in console from pygame:
 from os import environ 
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' 
@@ -23,7 +24,9 @@ import statistics
 '''SETUP'''
 # Setup logging:
 current_datetime = datetime.now()
-filename_visual_oddball = str(current_datetime.strftime("%Y-%m-%d %H-%M-%S")) + ' Visual_Oddball.log'
+formatted_datetime = str(current_datetime.strftime("%Y-%m-%d %H-%M-%S"))
+logging_path = Path("Desktop", "tasks", "data", "visual_oddball", "logging_data").resolve()
+filename_visual_oddball = os.path.join(logging_path, formatted_datetime)
 
 logging.basicConfig(
     level = logging.DEBUG,
