@@ -52,7 +52,7 @@ testmode = False
 
 # Experimental settings:
 presentation_screen = 0 # stimuli are presented on internal screen 0.
-number_of_repetitions = 40
+number_of_repetitions = 30
 number_of_practice_repetitions = 2
 number_of_repetitions_standards = 1
 stimulus_duration_in_seconds = 0.075
