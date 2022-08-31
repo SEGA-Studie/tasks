@@ -47,7 +47,7 @@ logging.info(f'{trials_data_folder}')
 logging.info(f'{eyetracking_data_folder}')
 
 # Testmode.
-# TRUE mimicks an eye-Ttracker by mouse movement, FALSE = eye-tracking hardware is required.
+# TRUE mimicks an eye-tracker by mouse movement, FALSE = eye-tracking hardware is required.
 testmode = False
 
 # Experimental settings:
@@ -58,9 +58,11 @@ number_of_repetitions_standards = 1
 stimulus_duration_in_seconds = 0.075
 standard_ball_color = (128, 0, 128)
 size_fixation_cross_in_pixels = 60
+
 standard_ball_size = size_fixation_cross_in_pixels
-high_salience_ball_size = round(0.5 * size_fixation_cross_in_pixels)
-low_salience_ball_size = round(0.75 * size_fixation_cross_in_pixels)
+high_salience_ball_size = round(1.5 * size_fixation_cross_in_pixels)
+low_salience_ball_size = round(1.25 * size_fixation_cross_in_pixels)
+
 ISI_interval = [2250, 2500]
 gaze_offset_cutoff = 3 * size_fixation_cross_in_pixels
 background_color_rgb = (0, 0, 0) # grey
