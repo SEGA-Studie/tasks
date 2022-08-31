@@ -58,11 +58,9 @@ number_of_repetitions_standards = 1
 stimulus_duration_in_seconds = 0.075
 standard_ball_color = (128, 0, 128)
 size_fixation_cross_in_pixels = 60
-
 standard_ball_size = size_fixation_cross_in_pixels
 high_salience_ball_size = round(1.5 * size_fixation_cross_in_pixels)
 low_salience_ball_size = round(1.25 * size_fixation_cross_in_pixels)
-
 ISI_interval = [2250, 2500]
 gaze_offset_cutoff = 3 * size_fixation_cross_in_pixels
 background_color_rgb = (0, 0, 0) # grey
@@ -180,16 +178,22 @@ trigger_name_list = ['PLACEHOLDER', #0
                      'practice_trial', #13 -
                      'practoddball_block', #14 -
                      'response', #15 -
-                     'standard', #16 
-                     'oddball_shigh_uhigh', #17 -
-                     'oddball_shigh_ulow', #18 -
-                     'oddball_slow_uhigh', # 19 -
-                     'oddball_slow_ulow', # 20 -
-                     'pract_standard', #21 -
-                     'practoddball_shigh_uhigh', #22 -
-                     'practoddball_shigh_ulow', # 23 -
-                     'practoddball_slow_uhigh', # 24 -
-                     'practoddball_slow_ulow', # 25 -
+                     'standard_shigh_uhigh', #16 -
+                     'standard_shigh_ulow', #17 -
+                     'standard_slow_uhigh', #18 -
+                     'standard_slow_ulow', #19 -
+                     'oddball_shigh_uhigh', #20 -
+                     'oddball_shigh_ulow', #21 -
+                     'oddball_slow_uhigh', # 22 -
+                     'oddball_slow_ulow', # 23 -
+                     'pract_standard_shigh_uhigh', #24 -
+                     'pract_standard_shigh_ulow', #25 -
+                     'pract_standard_slow_uhigh', #26 -
+                     'pract_standard_slow_ulow', #27 -
+                     'practoddball_shigh_uhigh', #28 -
+                     'practoddball_shigh_ulow', # 29 -
+                     'practoddball_slow_uhigh', # 30 -
+                     'practoddball_slow_ulow', # 31 -
                      ]
 
 print(trigger_name_list)
@@ -525,8 +529,14 @@ def present_ball(duration, trial, salience, utility, block):
     logging.info(' PRESENTING BALL: ' f'{duration}' ' ' f'{trial}' ' ' f'{salience}' ' ' f'{utility}')
     
     if block == 'oddball_block': 
-        if trial == 'standard':
-            send_trigger('standard')
+        if trial == 'standard' and salience == '+' and utility == '+':
+            send_trigger('standard_shigh_uhigh')
+        elif trial == 'standard' and salience == '+' and utility == '-':
+            send_trigger('standard_shigh_ulow')
+        elif trial == 'standard' and salience == '-' and utility == '+':
+            send_trigger('standard_slow_uhigh')
+        elif trial == 'standard' and salience == '-' and utility == '-':
+            send_trigger('standard_slow_ulow')
         elif trial == 'oddball' and salience == '+' and utility == '+':
             send_trigger('oddball_shigh_uhigh')
         elif trial == 'oddball' and salience == '+' and utility == '-':
@@ -536,8 +546,14 @@ def present_ball(duration, trial, salience, utility, block):
         elif trial == 'oddball' and salience == '-' and utility == '-':
             send_trigger('oddball_slow_ulow')
     if block == 'practice_block':
-        if trial == 'standard':
-            send_trigger('pract_standard')
+        if trial == 'standard' and salience == '+' and utility == '+':
+            send_trigger('pract_standard_shigh_uhigh')
+        elif trial == 'standard'and salience == '+' and utility == '-':
+            send_trigger('pract_standard_shigh_ulow')    
+        elif trial == 'standard' and salience == '-' and utility == '+':
+            send_trigger('pract_standard_slow_uhigh')   
+        elif trial == 'standard' and salience == '-' and utility == '-':
+            send_trigger('pract_standard_slow_ulow') 
         elif trial == 'oddball' and salience == '+' and utility == '+':
             send_trigger('practoddball_shigh_uhigh')
         elif trial == 'oddball' and salience == '+' and utility == '-':
@@ -653,7 +669,7 @@ for phase in phase_handler:
         print('MEDIAN = ' , responses_median)
         logging.info(' MEDIAN = ' f'{responses_median}')
         # Showing instruction slide:
-        text_3 = "Die Übung ist beendet.\nBitte bleibe still sitzen.\nHast du Fragen zur Aufgabe?\n\nNein? Dann kannst sie jetzt\nmit der Leertaste starten."
+        text_3 = "Die Übung ist beendet.\nBitte bleibe still sitzen.\nHast du Fragen zur Aufgabe?\n\nNein? Dann kannst du sie jetzt\nmit der Leertaste starten."
         print('SHOW INSTRUCTION SLIDE 3')
         logging.info(' SHOW INSTRUCTION SLIDE 3')
         draw_instruction(text = text_3)
@@ -671,7 +687,7 @@ for phase in phase_handler:
     if phase.startswith('oddball_'):
         # Common oddball setup.
         oddball_parameters = phase.split('_')[1] # remove the 'oddball_' portion of the phase name
-        (u, s) = oddball_parameters # u = utility; s = slience
+        (s, u) = oddball_parameters # s = slience; u = utility
         # Sequence for trial handler with 1/5 chance for an oddball.
         stimulus_sequence = ['standard','standard','standard','standard','oddball']
         # Define a sequence for trial handler with 3 standard stimuli.
