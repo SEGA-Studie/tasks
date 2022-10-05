@@ -98,6 +98,7 @@ parallel_port_adress = 0x03FF8
 # Presenting a dialog box. Infos are added to settings.
 settings['id'] = 123 #default testing value
 settings['group'] = ['ASD', 'TD']
+settings['luminance'] = 0
 
 dlg = gui.DlgFromDict(settings,title='auditory oddball')
 if dlg.OK:
@@ -107,9 +108,10 @@ else:
     core.quit()  # the user hit cancel so exit
 
 # Name for output data:
-fileName = str(settings['id']) + '_' + data.getDateStr(format="%Y-%m-%d-%H%M")
+fileName = 'auditory_' + data.getDateStr(format="%Y-%m-%d-%H%M")
 
 # Experiment handler saves experiment data automatically.
+# The dictionary "settings" is passed to the experiment handler.
 exp = data.ExperimentHandler(
     name="auditory_oddball",
     version='0.1',
