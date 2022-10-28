@@ -418,9 +418,8 @@ def check_nodata(gaze_position):
 # Get gaze position and offset cutoff.
 # Then check for the offset of gaze from the center screen.
 def check_gaze_offset(gaze_position):
-    gaze_position = tracker.getPosition()
+    # gaze_position = tracker.getPosition()
     gaze_center_offset = numpy.sqrt((gaze_position[0])**2 + (gaze_position[1])**2) # Pythagoras theorem
-
     if gaze_center_offset >= gaze_offset_cutoff:
         offset_boolean = True
     else:
