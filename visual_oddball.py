@@ -93,7 +93,7 @@ else:
     core.quit()  # the user hit cancel to exit
 
 # Name for output data:
-fileName = str(settings['id']) + '_' + data.getDateStr(format="%Y-%m-%d-%H%M")
+fileName = f'visual_{settings["id"]}_{data.getDateStr(format="%Y-%m-%d-%H%M")}'
 
 # Experiment handler saves experiment data automatically.
 exp = data.ExperimentHandler(

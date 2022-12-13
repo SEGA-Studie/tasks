@@ -108,7 +108,7 @@ else:
     core.quit()  # the user hit cancel so exit
 
 # Name for output data:
-fileName = 'auditory_' + data.getDateStr(format="%Y-%m-%d-%H%M")
+fileName = f'auditory_{settings["id"]}_{data.getDateStr(format="%Y-%m-%d-%H%M")}'
 
 # Experiment handler saves experiment data automatically.
 # The dictionary "settings" is passed to the experiment handler.
